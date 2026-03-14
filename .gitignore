@@ -1,0 +1,20 @@
+# .gitignore
+
+# Fotografias dos alunos (dados pessoais)
+public/uploads/photos/*
+!public/uploads/photos/.gitkeep
+
+# Ficheiros de configuração local (com passwords reais)
+config/database.php
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
