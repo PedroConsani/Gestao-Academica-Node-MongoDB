@@ -21,6 +21,7 @@
             <?php endif; ?>
 
             <form method="POST" action="<?= APP_URL ?>/login.php" novalidate>
+
                 <div class="form-group">
                     <label for="email">Email</label>
                     <input type="email" id="email" name="email" required autocomplete="email"
@@ -34,6 +35,11 @@
                     Iniciar Sessão
                 </button>
             </form>
+
+            <p style="text-align:center;margin-top:1.25rem;font-size:.875rem;color:var(--text-muted);">
+                Ainda não tem conta?
+                <a href="<?= APP_URL ?>/register.php" style="color:var(--primary);font-weight:500;">Criar conta de aluno</a>
+            </p>
         </div>
     </div>
 </div>

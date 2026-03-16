@@ -1,16 +1,10 @@
 # public/.htaccess
 Options -Indexes
-ServerSignature Off
 
 # Bloquear acesso direto a ficheiros sensíveis
-<FilesMatch "\.(sql|md|log|env)$">
+<FilesMatch "\.(sql|md|log|env|gitignore)$">
     Order allow,deny
     Deny from all
-</FilesMatch>
-
-# Impedir acesso à pasta uploads exceto imagens
-<FilesMatch "^(?!.*\.(jpg|jpeg|png)$)">
-    # Permitir apenas imagens em uploads
 </FilesMatch>
 
 # Cabeçalhos de segurança
@@ -18,8 +12,7 @@ ServerSignature Off
     Header always set X-Content-Type-Options "nosniff"
     Header always set X-Frame-Options "SAMEORIGIN"
     Header always set X-XSS-Protection "1; mode=block"
-    Header always set Referrer-Policy "strict-origin-when-cross-origin"
 </IfModule>
 
-# Redirecionar raiz para index.php
+# Página de entrada por omissão
 DirectoryIndex index.php

@@ -1,11 +1,9 @@
 # .htaccess (raiz do projeto)
-# Bloquear acesso direto a tudo exceto public/
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteCond %{REQUEST_URI} !^/academic_system/public/
-    RewriteRule ^ - [F,L]
-</IfModule>
+# Bloquear listagem de diretórios
+Options -Indexes
 
-# Negar acesso à raiz diretamente
-Order allow,deny
-Deny from all
+# Proteger ficheiros sensíveis
+<FilesMatch "\.(sql|log|env|md|gitignore)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
