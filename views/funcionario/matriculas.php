@@ -40,7 +40,10 @@ ob_start(); ?>
                     <td><?= $m['id'] ?></td>
                     <td>
                         <strong><?= e($m['aluno_nome']) ?></strong><br>
-                        <small style="color:var(--text-muted)"><?= e($m['aluno_email']) ?></small>
+                        <small style="color:var(--text-muted)"><?= e($m['aluno_email'] ?? '') ?></small>
+</xai:function_call >
+
+<xai:function_call name="read_file">
                     </td>
                     <td><?= e($m['curso_nome']) ?></td>
                     <td><?= e($m['ano_letivo']) ?></td>

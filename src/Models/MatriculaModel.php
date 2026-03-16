@@ -38,7 +38,7 @@ class MatriculaModel {
 
     public function allPendentes(): array {
         $stmt = $this->db->query("
-            SELECT m.*, c.nome AS curso_nome, a.nome AS aluno_nome, a.email AS aluno_email
+            SELECT m.*, c.nome AS curso_nome, a.nome AS aluno_nome, COALESCE(a.email, '') AS aluno_email
             FROM matriculas m
             JOIN cursos c ON c.id = m.curso_id
             JOIN utilizadores a ON a.id = m.aluno_id
@@ -50,7 +50,7 @@ class MatriculaModel {
 
     public function all(): array {
         $stmt = $this->db->query("
-            SELECT m.*, c.nome AS curso_nome, a.nome AS aluno_nome,
+            SELECT m.*, c.nome AS curso_nome, a.nome AS aluno_nome, COALESCE(a.email, '') AS aluno_email,
                    f.nome AS decidido_por_nome
             FROM matriculas m
             JOIN cursos c ON c.id = m.curso_id

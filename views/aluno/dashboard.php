@@ -1,5 +1,7 @@
 <?php // views/aluno/dashboard.php
 $pageTitle = 'Dashboard do Aluno';
+$totalNotas   = $totalNotas   ?? 0;
+$ultimasNotas = $ultimasNotas ?? [];
 ob_start(); ?>
 
 <div class="page-header">
@@ -18,6 +20,10 @@ ob_start(); ?>
     <div class="stat-card">
         <div class="stat-num"><?= $matriculasAprovadas ?></div>
         <div class="stat-label">Matrículas Aprovadas</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-num"><?= $totalNotas  ?></div>
+        <div class="stat-label">Notas Lançadas</div>
     </div>
 </div>
 
@@ -61,6 +67,41 @@ ob_start(); ?>
         <?php endif; ?>
         <a href="<?= APP_URL ?>/aluno/matricula-nova.php" class="btn btn-primary btn-sm" style="margin-top:.75rem;">Nova Matrícula</a>
     </div>
+</div>
+
+<div class="card">
+    <div class="card-title">📊 Últimas Notas</div>
+    <?php if ($ultimasNotas): ?>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>UC</th><th>Época</th><th>Nota</th><th>Situação</th></tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($ultimasNotas as $n): ?>
+                    <tr>
+                        <td><?= e($n['uc_codigo']) ?> — <?= e($n['uc_nome']) ?></td>
+                        <td><?= e($n['epoca']) ?></td>
+                        <td><strong><?= $n['nota_final'] !== null ? number_format($n['nota_final'], 1) : '—' ?></strong></td>
+                        <td>
+                            <?php if ($n['nota_final'] === null): ?>
+                                <span class="badge badge-rascunho">Por lançar</span>
+                            <?php elseif ($n['nota_final'] >= 10): ?>
+                                <span class="badge badge-aprovada">✔ Aprovado</span>
+                            <?php else: ?>
+                                <span class="badge badge-rejeitada">✘ Reprovado</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+        <a href="<?= APP_URL ?>/aluno/notas.php" class="btn btn-secondary btn-sm" style="margin-top:.75rem;">Ver todas as notas</a>
+    <?php else: ?>
+        <p style="color:var(--text-muted);">Ainda não existem notas lançadas para si.</p>
+        <a href="<?= APP_URL ?>/aluno/notas.php" class="btn btn-secondary btn-sm" style="margin-top:.75rem;">Ver pauta completa</a>
+    <?php endif; ?>
 </div>
 
 <?php
