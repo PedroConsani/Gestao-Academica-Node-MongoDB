@@ -102,4 +102,19 @@ class MatriculaModel {
         $stmt->execute([$cursoId, $anoLetivo]);
         return $stmt->fetchAll();
     }
+
+    /**
+     * Retorna os IDs de cursos nos quais o aluno já tem matrícula
+     * ativa (pendente ou aprovada). Rejeitadas permitem nova tentativa.
+     */
+    public function cursosJaMatriculados(int $alunoId): array {
+        $stmt = $this->db->prepare("
+            SELECT curso_id
+            FROM matriculas
+            WHERE aluno_id = ?
+              AND estado IN ('pendente', 'aprovada')
+        ");
+        $stmt->execute([$alunoId]);
+        return array_column($stmt->fetchAll(), 'curso_id');
+    }
 }

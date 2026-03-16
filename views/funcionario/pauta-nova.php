@@ -3,7 +3,10 @@ $pageTitle = 'Nova Pauta';
 ob_start(); ?>
 
 <div class="page-header">
-    <h1>📝 Criar Nova Pauta</h1>
+    <div>
+        <p>Serviços Académicos</p>
+        <h1>Criar Nova Pauta</h1>
+    </div>
     <a href="<?= APP_URL ?>/funcionario/pautas.php" class="btn btn-secondary btn-sm">← Voltar</a>
 </div>
 
@@ -49,20 +52,21 @@ ob_start(); ?>
                 <label>Época *</label>
                 <select name="epoca" required>
                     <?php foreach (EPOCAS as $ep): ?>
-                        <option value="<?= $ep ?>" <?= ($_POST['epoca'] ?? 'Normal') === $ep ? 'selected' : '' ?>><?= $ep ?></option>
+                        <option value="<?= $ep ?>" <?= ($_POST['epoca'] ?? 'Normal') === $ep ? 'selected' : '' ?>>
+                            <?= $ep ?>
+                        </option>
                     <?php endforeach; ?>
                 </select>
             </div>
         </div>
-        <div class="alert alert-info">
+        <div class="alert alert-info" style="margin-bottom:1.25rem;">
             Os alunos com matrícula aprovada no curso/ano letivo selecionado serão automaticamente adicionados à pauta.
         </div>
-        <button type="submit" class="btn btn-success">Criar Pauta</button>
+        <button type="submit" class="btn btn-primary">Criar Pauta</button>
     </form>
 </div>
 
 <script>
-// Filtrar UCs pelo curso selecionado via AJAX simples
 const ucData = <?= json_encode($ucsPorCurso) ?>;
 document.getElementById('curso_id').addEventListener('change', function() {
     const sel = document.getElementById('uc_id');

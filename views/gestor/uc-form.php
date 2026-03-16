@@ -3,7 +3,10 @@ $pageTitle = isset($uc) ? 'Editar UC' : 'Nova UC';
 ob_start(); ?>
 
 <div class="page-header">
-    <h1><?= isset($uc) ? '✏️ Editar Unidade Curricular' : '➕ Nova Unidade Curricular' ?></h1>
+    <div>
+        <p>Gestão Pedagógica</p>
+        <h1><?= isset($uc) ? 'Editar Unidade Curricular' : 'Nova Unidade Curricular' ?></h1>
+    </div>
     <a href="<?= APP_URL ?>/gestor/ucs.php" class="btn btn-secondary btn-sm">← Voltar</a>
 </div>
 
@@ -23,7 +26,8 @@ ob_start(); ?>
             </div>
             <div class="form-group">
                 <label>Código *</label>
-                <input type="text" name="codigo" maxlength="20" required style="text-transform:uppercase"
+                <input type="text" name="codigo" maxlength="20" required
+                       style="text-transform:uppercase"
                        value="<?= e($uc['codigo'] ?? $_POST['codigo'] ?? '') ?>">
             </div>
         </div>
@@ -31,7 +35,7 @@ ob_start(); ?>
             <label>Descrição</label>
             <textarea name="descricao" rows="3"><?= e($uc['descricao'] ?? $_POST['descricao'] ?? '') ?></textarea>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="max-width:200px;">
             <label>Créditos ECTS *</label>
             <input type="number" name="creditos" min="0.5" max="30" step="0.5" required
                    value="<?= e($uc['creditos'] ?? $_POST['creditos'] ?? '6') ?>">

@@ -6,6 +6,7 @@ requireRole(ROLE_ALUNO);
 $matriculaModel = new MatriculaModel();
 $fichaModel     = new FichaAlunoModel();
 $cursoModel     = new CursoModel();
+$ucModel        = new UCModel();
 $userId         = currentUser()['id'];
 $errors         = [];
 
@@ -16,6 +17,9 @@ if (!$ficha || $ficha['estado'] !== FICHA_APROVADA) {
     redirect(APP_URL . '/aluno/dashboard.php');
 }
 
+// Cursos em que o aluno já tem matrícula pendente ou aprovada
+$cursosJaMatriculados = $matriculaModel->cursosJaMatriculados($userId);
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $v = new Validator($_POST);
     $v->required('curso_id', 'Curso')
@@ -25,24 +29,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$v->passes()) {
         $errors = array_values($v->errors());
     } else {
-        $matriculaModel->create(
-            $userId,
-            (int) $_POST['curso_id'],
-            trim($_POST['ano_letivo']),
-            trim($_POST['observacoes'] ?? '')
-        );
-        flash('success', 'Pedido de matrícula submetido com sucesso!');
-        redirect(APP_URL . '/aluno/matriculas.php');
+        $cursoId = (int) $_POST['curso_id'];
+
+        // Verificar duplicação no servidor (mesmo que a view já bloqueie)
+        if (in_array($cursoId, $cursosJaMatriculados)) {
+            $errors[] = 'Já tem uma matrícula ativa ou pendente neste curso.';
+        } else {
+            $matriculaModel->create(
+                $userId,
+                $cursoId,
+                trim($_POST['ano_letivo']),
+                trim($_POST['observacoes'] ?? '')
+            );
+            flash('success', 'Pedido de matrícula submetido com sucesso!');
+            redirect(APP_URL . '/aluno/matriculas.php');
+        }
     }
 }
 
 $cursos = $cursoModel->all(true);
 
-$ucModel = new UCModel();
+// UCModel::getByCurso() retorna: id, nome, codigo, creditos, primeiro_ano, primeiro_semestre
 $ucsPorCurso = [];
-foreach ($cursos as $curso) {
-    $ucsPorCurso[$curso['id']] = $ucModel->getByCurso($curso['id']);
+foreach ($cursos as $c) {
+    $ucsPorCurso[$c['id']] = $ucModel->getByCurso($c['id']);
 }
 
 include __DIR__ . '/../../views/aluno/matricula-nova.php';
-

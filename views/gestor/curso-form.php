@@ -3,7 +3,10 @@ $pageTitle = isset($curso) ? 'Editar Curso' : 'Novo Curso';
 ob_start(); ?>
 
 <div class="page-header">
-    <h1><?= isset($curso) ? '✏️ Editar Curso' : '➕ Novo Curso' ?></h1>
+    <div>
+        <p>Gestão Pedagógica</p>
+        <h1><?= isset($curso) ? 'Editar Curso' : 'Novo Curso' ?></h1>
+    </div>
     <a href="<?= APP_URL ?>/gestor/cursos.php" class="btn btn-secondary btn-sm">← Voltar</a>
 </div>
 
@@ -23,7 +26,8 @@ ob_start(); ?>
             </div>
             <div class="form-group">
                 <label>Código *</label>
-                <input type="text" name="codigo" maxlength="20" required style="text-transform:uppercase"
+                <input type="text" name="codigo" maxlength="20" required
+                       style="text-transform:uppercase"
                        value="<?= e($curso['codigo'] ?? $_POST['codigo'] ?? '') ?>">
             </div>
         </div>
@@ -31,7 +35,7 @@ ob_start(); ?>
             <label>Descrição</label>
             <textarea name="descricao" rows="3"><?= e($curso['descricao'] ?? $_POST['descricao'] ?? '') ?></textarea>
         </div>
-        <div class="form-group">
+        <div class="form-group" style="max-width:200px;">
             <label>Duração (anos) *</label>
             <select name="duracao_anos" required>
                 <?php for ($a = 1; $a <= ANOS_MAX; $a++): ?>
