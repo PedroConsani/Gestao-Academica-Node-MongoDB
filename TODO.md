@@ -1,8 +1,11 @@
-# Task: Permitir preview de cursos e UCs antes de matricular
+# TODO: Atualizar README.md
 
-## Steps:
-- [x] 1. Edit src/Models/UCModel.php - Add getByCurso() method
-- [x] 2. Edit public/aluno/matricula-nova.php - Fetch ucsPorCurso and pass to view
-- [x] 3. Edit views/aluno/matricula-nova.php - Redesign UI with course list + UC preview
-- [x] 4. Test functionality (login as aluno, verify preview, submit form)
-- [x] 5. Mark complete
+## Passos do Plano Aprovado:
+
+- [x] 1. Criar/atualizar seção Funcionalidades por role
+- [x] 2. Sincronizar Estrutura do Projeto com ficheiros atuais
+- [x] 3. Atualizar Fluxos Principais e adicionar notas-curso.php
+- [x] 4. Rever instalação e adicionar quick start
+- [x] 5. Polish geral e adicionar git commit suggestion
+
+**✅ Plano concluído!** README.md atualizado com estrutura atual, novas funcionalidades, quick start e mais seções.

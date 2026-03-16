@@ -1,87 +1,145 @@
 # Sistema de Gestão Académica
 
-Aplicação web em PHP com MySQL/MariaDB para suporte aos Serviços Académicos e Gestão Pedagógica.
+Aplicação web em **PHP puro** com **MySQL/MariaDB** para gestão académica completa: fichas de aluno, matrículas, planos de estudos, pautas e notas.
+
+[![PHP](https://img.shields.io/badge/PHP-8.1%2B-777BB4)](https://www.php.net)
+[![MySQL](https://img.shields.io/badge/MySQL-8.0%2B-4479A1)](https://www.mysql.com)
+
+## 🚀 Quick Start
+
+```bash
+# 1. Clone/inicie o projeto
+git clone <repo> gestao-academica
+cd gestao-academica
+
+# 2. BD
+mysql -u root -p < database/schema.sql
+php database/seed.php
+
+# 3. Config (edite config/database.php e config/app.php)
+# 4. Inicie Apache/XAMPP → http://localhost/gestao-academica/public/
+
+# Test users:
+# gestor@academia.pt / gestor123 (Gestor)
+# func@academia.pt / func123 (Funcionário)
+# aluno@academia.pt / aluno123 (Aluno)
+```
 
 ---
 
-## Requisitos
+## 📋 Requisitos
 
-- PHP 8.1+
-- MySQL 8.0+ / MariaDB 10.6+
-- Apache com `mod_rewrite` ativo
-- Extensões PHP: `pdo_mysql`, `fileinfo`, `mbstring`
+| Requisito | Versão Mínima |
+|-----------|---------------|
+| PHP | 8.1+ |
+| MySQL/MariaDB | 8.0+/10.6+ |
+| Apache | `mod_rewrite` |
+| Extensões PHP | `pdo_mysql`, `fileinfo`, `mbstring` |
 
 ---
 
-## Instalação
+## 🛠️ Instalação Detalhada
 
-### 1. Configurar Base de Dados
-
+### 1. Base de Dados
 ```bash
 mysql -u root -p < database/schema.sql
+php database/seed.php  # Cria users de teste
 ```
 
-### 2. Popular com dados iniciais
-
-```bash
-php database/seed.php
-```
-
-Utilizadores criados:
-
-| Email                    | Password   | Perfil       |
-|--------------------------|------------|--------------|
-| gestor@academia.pt       | gestor123  | Gestor       |
-| funcionario@academia.pt  | func123    | Funcionário  |
-| aluno@academia.pt        | aluno123   | Aluno        |
-
-### 3. Configurar ligação à BD
-
-Editar `config/database.php`:
-
+### 2. Configuração
+**`config/database.php`:**
 ```php
 define('DB_HOST', 'localhost');
-define('DB_NAME', 'academic_system');
+define('DB_NAME', 'academic_system');  # Ajuste
 define('DB_USER', 'root');
-define('DB_PASS', 'a_sua_password');
+define('DB_PASS', '');
 ```
 
-### 4. Configurar URL da aplicação
-
-Editar `config/app.php`:
-
+**`config/app.php`:**
 ```php
-define('APP_URL', 'http://localhost/academic_system/public');
+define('APP_URL', 'http://localhost/gestao-academica/public');
 ```
 
-### 5. Permissões da pasta de uploads
-
+### 3. Permissões
 ```bash
-chmod 755 public/uploads/photos/
+chmod -R 755 public/uploads/
 ```
 
 ---
 
-## Estrutura do Projeto
+## 🎯 Funcionalidades por Perfil
+
+### 👨‍💼 **Gestor**
+- Dashboard com overview
+- Gerir **Cursos** (criar/editar/toggle ativo)
+- Gerir **UCs** (criar/editar/toggle, associar a curso)
+- **Planos de Estudos** (ver/remover)
+- **Fichas de Alunos** (listar/validar rascunhos)
+
+### 👨‍💼 **Funcionário**
+- Dashboard
+- Gerir **Matrículas** (listar/decidir aprovar/rejeitar)
+- Gerir **Pautas** (criar/fechar, lançar notas)
+
+### 👨‍🎓 **Aluno**
+- Dashboard pessoal
+- **Ficha** (submeter rascunho)
+- **Matrículas** (ver/listar, ver cursos/UCs disponíveis)
+- **Notas** (ver por curso/pauta)
+
+### 🔐 **Autenticação**
+- Login/registo
+- Restrição por perfil
+- Logout seguro
+
+---
+
+## 📁 Estrutura do Projeto (Atualizada)
 
 ```
-academic_system/
+gestao-academica/
+├── .gitignore
+├── .htaccess
+├── README.md
+├── TODO.md
 ├── config/
-│   ├── app.php             # Constantes e configurações gerais
-│   ├── bootstrap.php       # Arranque: sessão, autoloader, helpers
-│   └── database.php        # Ligação PDO à BD
-│
+│   ├── app.php
+│   └── bootstrap.php  # + database.php
 ├── database/
-│   ├── schema.sql          # Script de criação das tabelas
-│   └── seed.php            # Dados iniciais (utilizadores de teste)
-│
+│   ├── schema.sql
+│   └── seed.php
+├── public/  # 📂 Apenas este exposto ao web
+│   ├── .htaccess
+│   ├── index.php
+│   ├── login.php, logout.php, register.php
+│   ├── aluno/  👨‍🎓
+│   │   ├── dashboard.php
+│   │   ├── ficha.php
+│   │   ├── matricula-nova.php
+│   │   ├── matriculas.php
+│   │   └── notas-curso.php
+│   ├── funcionario/  👨‍💼
+│   │   ├── dashboard.php
+│   │   ├── matricula-decidir.php
+│   │   ├── matriculas.php
+│   │   ├── pauta-nova.php
+│   │   ├── pauta-notas.php
+│   │   └── pautas.php
+│   ├── gestor/  👨‍💼
+│   │   ├── curso-editar.php, curso-novo.php, curso-toggle.php
+│   │   ├── cursos.php
+│   │   ├── dashboard.php
+│   │   ├── ficha-validar.php
+│   │   ├── fichas.php
+│   │   ├── plano-estudos.php, plano-remover.php
+│   │   ├── uc-editar.php, uc-nova.php, uc-toggle.php
+│   │   └── ucs.php
+│   ├── css/style.css
+│   └── uploads/photos/  # Fotos alunos
 ├── src/
-│   ├── Controllers/
-│   │   └── AuthController.php
-│   ├── Middleware/
-│   │   ├── UploadHelper.php
-│   │   └── Validator.php
-│   └── Models/
+│   ├── Controllers/AuthController.php
+│   ├── Middleware/ (UploadHelper.php, Validator.php)
+│   └── Models/  # Um por entidade
 │       ├── CursoModel.php
 │       ├── FichaAlunoModel.php
 │       ├── MatriculaModel.php
@@ -89,109 +147,37 @@ academic_system/
 │       ├── PlanoEstudosModel.php
 │       ├── UCModel.php
 │       └── UtilizadorModel.php
-│
-├── views/
-│   ├── layouts/
-│   │   └── main.php        # Layout HTML principal
-│   ├── auth/
-│   │   └── login.php
-│   ├── aluno/
-│   │   ├── dashboard.php
-│   │   ├── ficha.php
-│   │   ├── matriculas.php
-│   │   └── matricula-nova.php
-│   ├── funcionario/
-│   │   ├── dashboard.php
-│   │   ├── matriculas.php
-│   │   ├── matricula-decidir.php
-│   │   ├── pautas.php
-│   │   ├── pauta-nova.php
-│   │   └── pauta-notas.php
-│   ├── gestor/
-│   │   ├── dashboard.php
-│   │   ├── cursos.php
-│   │   ├── curso-form.php
-│   │   ├── plano-estudos.php
-│   │   ├── ucs.php (inline)
-│   │   ├── uc-form.php
-│   │   ├── fichas.php
-│   │   └── ficha-validar.php
-│   └── shared/
-│       └── 403.php
-│
-└── public/                 # Único diretório exposto ao servidor web
-    ├── .htaccess
-    ├── index.php
-    ├── login.php
-    ├── logout.php
-    ├── css/
-    │   └── style.css
-    ├── uploads/
-    │   └── photos/         # Fotografias dos alunos (gitignore)
-    ├── aluno/
-    │   ├── dashboard.php
-    │   ├── ficha.php
-    │   ├── matriculas.php
-    │   └── matricula-nova.php
-    ├── funcionario/
-    │   ├── dashboard.php
-    │   ├── matriculas.php
-    │   ├── matricula-decidir.php
-    │   ├── pautas.php
-    │   ├── pauta-nova.php
-    │   └── pauta-notas.php
-    └── gestor/
-        ├── dashboard.php
-        ├── cursos.php
-        ├── curso-novo.php
-        ├── curso-editar.php
-        ├── curso-toggle.php
-        ├── ucs.php
-        ├── uc-nova.php
-        ├── uc-editar.php
-        ├── uc-toggle.php
-        ├── plano-estudos.php
-        ├── plano-remover.php
-        ├── fichas.php
-        └── ficha-validar.php
+└── views/  # Templates (não direct access)
+    ├── layouts/main.php
+    ├── auth/ (login.php, register.php)
+    ├── aluno/*  👨‍🎓
+    ├── funcionario/*  👨‍💼
+    ├── gestor/*  👨‍💼 (inclui fichas.php, uc-form.php)
+    └── shared/403.php
 ```
 
 ---
 
-## Arquitetura
+## 🔄 Fluxos Principais
 
-O projeto segue um padrão **MVC simplificado sem framework**:
-
-- **`config/`** — configurações e bootstrap (inicialização da app)
-- **`src/Models/`** — acesso à base de dados via PDO (uma classe por entidade)
-- **`src/Controllers/`** — lógica de controlo (atualmente AuthController)
-- **`src/Middleware/`** — validação de dados e gestão de uploads
-- **`views/`** — templates PHP puros (nunca acedidos diretamente pelo browser)
-- **`public/`** — único diretório exposto; cada ficheiro carrega o bootstrap, valida sessão/perfil, chama o modelo e inclui a view
+1. **Ficha Aluno**: Rascunho → Submetida → **Gestor Aprova/Rejeita**
+2. **Matrícula**: Aluno vê **Cursos + UCs** → Pede → Funcionário **Aprova/Rejeita**
+3. **Pauta**: Funcionário cria (aberta) → Lança notas → **Fecha**
+4. **Novidade**: `/aluno/notas-curso.php` - Notas detalhadas por curso
 
 ---
 
-## Fluxos Principais
+## 🛡️ Segurança & Best Practices
 
-### Ficha de Aluno
-`Rascunho → Submetida → Aprovada | Rejeitada` *(Gestor aprova)*
+- ✅ Passwords bcrypt (`password_hash`)
+- ✅ Sessões seguras (regen ID, timeout)
+- ✅ PDO prepared statements (anti-SQLi)
+- ✅ Uploads validados (`finfo` MIME)
+- ✅ XSS: `htmlspecialchars()` everywhere
+- ✅ CSRF? Via session checks + referer
+- ✅ .htaccess: security headers, deny hidden files
 
-### Matrícula
-`Pendente → Aprovada | Rejeitada` *(Funcionário aprova; aluno vê UCs antes de pedir)*
+**Arquitetura**: MVC lightweight - cada `public/*.php` → bootstrap → auth check → model → view.
 
-### Pauta
-`Criada (Aberta) → [notas lançadas] → Fechada` *(Funcionário)*
 
-**Novidade:** Aluno pode agora visualizar cursos e suas UCs (código, nome, ECTS, ano/semestre) antes de submeter matrícula em `/aluno/matricula-nova.php`.
 
----
-
-## Segurança
-
-- Passwords com `password_hash()` (bcrypt, cost 12)
-- Sessões com expiração e regeneração de ID no login
-- Acesso restringido por perfil em cada entry point
-- Uploads validados por MIME type real (não apenas extensão)
-- Toda a saída HTML escapada com `htmlspecialchars()`
-- Queries parametrizadas com PDO (sem SQL injection)
-- Cabeçalhos HTTP de segurança via `.htaccess`
