@@ -174,13 +174,15 @@ O projeto segue um padrão **MVC simplificado sem framework**:
 ## Fluxos Principais
 
 ### Ficha de Aluno
-`Rascunho → Submetida → Aprovada | Rejeitada`
+`Rascunho → Submetida → Aprovada | Rejeitada` *(Gestor aprova)*
 
 ### Matrícula
-`Pendente → Aprovada | Rejeitada`
+`Pendente → Aprovada | Rejeitada` *(Funcionário aprova; aluno vê UCs antes de pedir)*
 
 ### Pauta
-`Criada (Aberta) → [notas lançadas] → Fechada`
+`Criada (Aberta) → [notas lançadas] → Fechada` *(Funcionário)*
+
+**Novidade:** Aluno pode agora visualizar cursos e suas UCs (código, nome, ECTS, ano/semestre) antes de submeter matrícula em `/aluno/matricula-nova.php`.
 
 ---
 
