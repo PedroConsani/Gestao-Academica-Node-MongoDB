@@ -2,7 +2,7 @@
 // config/app.php
 
 define('APP_NAME', 'Sistema Académico');
-define('APP_URL', 'http://localhost/TP1-Gestao-Academica/public');
+define('APP_URL', 'http://localhost/Gestao-Academica/public');
 define('SESSION_LIFETIME', 1800); // 30 minutos
 
 // Upload settings

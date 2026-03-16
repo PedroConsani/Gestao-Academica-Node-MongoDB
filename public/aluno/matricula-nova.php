@@ -37,4 +37,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 }
 
 $cursos = $cursoModel->all(true);
+
+$ucModel = new UCModel();
+$ucsPorCurso = [];
+foreach ($cursos as $curso) {
+    $ucsPorCurso[$curso['id']] = $ucModel->getByCurso($curso['id']);
+}
+
 include __DIR__ . '/../../views/aluno/matricula-nova.php';
+

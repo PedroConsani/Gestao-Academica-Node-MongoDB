@@ -7,11 +7,9 @@ require_once __DIR__ . '/../config/database.php';
 $pdo = getDB();
 
 $users = [
-    ['Admin Gestor',    'gestor@academia.pt',     'gestor123',     'gestor'],
-    ['Ana Funcionária', 'funcionario@academia.pt', 'func123',       'funcionario'],
-    ['João Aluno',      'aluno@academia.pt',       'aluno123',      'aluno'],
-    ['Pedro',           'pedro@academia.pt',       'senha123',      'gestor'],
-    ['Gabriel',           'gabriel@academia.pt',       'func123',      'funcionario'],
+    ['Aluno',      'aluno@academia.pt',       'aluno123',      'aluno'],
+    ['Gestor',     'gestor@academia.pt',       'gestor123',      'gestor'],
+    ['Funcionário', 'func@academia.pt',       'func123',      'funcionario'],
 ];
 
 $stmt = $pdo->prepare("

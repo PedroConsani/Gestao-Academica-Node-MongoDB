@@ -72,4 +72,24 @@ class UCModel {
         $stmt->execute([$cursoId]);
         return $stmt->fetchAll();
     }
+
+    /**
+     * Get active UCs associated with a course via plano_estudos
+     * Groups by UC, shows first ano/semestre occurrence
+     */
+    public function getByCurso(int $cursoId): array {
+        $stmt = $this->db->prepare("
+            SELECT DISTINCT 
+                uc.id, uc.nome, uc.codigo, uc.descricao, uc.creditos,
+                MIN(pe.ano) as primeiro_ano,
+                MIN(pe.semestre) as primeiro_semestre
+            FROM unidades_curriculares uc
+            JOIN plano_estudos pe ON pe.uc_id = uc.id
+            WHERE uc.ativo = 1 AND pe.curso_id = ?
+            GROUP BY uc.id, uc.nome, uc.codigo, uc.descricao, uc.creditos
+            ORDER BY MIN(pe.ano), MIN(pe.semestre), uc.codigo
+        ");
+        $stmt->execute([$cursoId]);
+        return $stmt->fetchAll();
+    }
 }
