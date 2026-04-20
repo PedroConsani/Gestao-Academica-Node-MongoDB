@@ -1,0 +1,41 @@
+<h2>Nova Matrícula</h2>
+
+<form method="POST" action="/aluno/matricula">
+    <div style="margin-bottom: 15px;">
+        <label for="curso_id">Curso:</label>
+        <select id="curso_id" name="curso_id" required 
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+            <option value="">Selecione um curso</option>
+            <% if (cursos) { %>
+                <% cursos.forEach(curso => { %>
+                    <option value="<%= curso._id %>"><%= curso.nome %> (<%= curso.codigo %>)</option>
+                <% }); %>
+            <% } %>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="ano_letivo">Ano Letivo:</label>
+        <input type="text" id="ano_letivo" name="ano_letivo" placeholder="ex: 2024/2025" 
+               pattern="\d{4}/\d{4}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="observacoes_aluno">Observações (opcional):</label>
+        <textarea id="observacoes_aluno" name="observacoes_aluno" 
+                  style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px; min-height: 100px;"></textarea>
+    </div>
+
+    <% if (typeof error !== 'undefined' && error) { %>
+        <div class="alert alert-error"><%= error %></div>
+    <% } %>
+
+    <button type="submit" class="btn btn-primary">Solicitar Matrícula</button>
+    <a href="/aluno/matriculas" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<style>
+    form { max-width: 600px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    select, textarea { font-family: inherit; }
+</style>

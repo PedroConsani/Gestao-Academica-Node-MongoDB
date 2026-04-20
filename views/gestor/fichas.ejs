@@ -1,0 +1,45 @@
+<h2>Fichas de Aluno para Validar</h2>
+
+<div style="margin: 20px 0;">
+    <a href="/gestor/fichas?estado=submetida" class="btn btn-primary">Submetidas</a>
+    <a href="/gestor/fichas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
+    <a href="/gestor/fichas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
+    <a href="/gestor/fichas" class="btn btn-secondary">Todas</a>
+</div>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f1f3f5;">
+            <th style="padding: 10px; text-align: left;">Aluno</th>
+            <th style="padding: 10px; text-align: left;">Curso</th>
+            <th style="padding: 10px; text-align: left;">Estado</th>
+            <th style="padding: 10px; text-align: center;">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (fichas && fichas.length > 0) { %>
+            <% fichas.forEach(ficha => { %>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 10px;"><%= ficha.aluno_id.nome %></td>
+                    <td style="padding: 10px;"><%= ficha.curso_id ? ficha.curso_id.nome : 'N/A' %></td>
+                    <td style="padding: 10px;">
+                        <span style="padding: 5px 10px; border-radius: 5px; 
+                            <%= ficha.estado === 'aprovada' ? 'background: #d4edda; color: #155724;' : 
+                                ficha.estado === 'rejeitada' ? 'background: #f8d7da; color: #721c24;' :
+                                ficha.estado === 'submetida' ? 'background: #d1ecf1; color: #0c5460;' :
+                                'background: #fff3cd; color: #856404;' %>">
+                            <%= ficha.estado %>
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center;">
+                        <a href="/gestor/ficha/<%= ficha._id %>/validar" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">Ver</a>
+                    </td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="4" style="padding: 20px; text-align: center; color: #999;">Nenhuma ficha encontrada</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>

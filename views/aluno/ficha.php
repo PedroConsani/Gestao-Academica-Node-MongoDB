@@ -25,6 +25,14 @@ ob_start(); ?>
     </div>
 <?php endif; ?>
 
+<?php if (!$readonly): ?>
+<div style="margin-bottom:1.25rem;">
+    <button type="button" onclick="preencherAleatorio()" class="btn btn-secondary btn-sm">
+        🎲 Preencher com dados aleatórios
+    </button>
+</div>
+<?php endif; ?>
+
 <form method="POST" action="<?= APP_URL ?>/aluno/ficha.php" enctype="multipart/form-data">
 
     <div class="card">
@@ -134,6 +142,67 @@ ob_start(); ?>
         </div>
     <?php endif; ?>
 </form>
+
+<?php if (!$readonly): ?>
+<script>
+function preencherAleatorio() {
+    const nomes     = ['Silva','Santos','Ferreira','Costa','Oliveira','Rodrigues','Martins','Sousa','Pereira','Carvalho'];
+    const ruas      = ['Rua da Liberdade','Avenida dos Aliados','Rua de Santo António','Travessa do Carmo','Rua do Ouro','Avenida da República','Rua das Flores','Rua do Almada'];
+    const localidades = ['Lisboa','Porto','Braga','Coimbra','Aveiro','Faro','Setúbal','Viseu','Évora','Leiria'];
+    const rand      = (arr) => arr[Math.floor(Math.random() * arr.length)];
+    const randInt   = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+    const padZero   = (n, len) => String(n).padStart(len, '0');
+
+    // Data nascimento — entre 1985 e 2004
+    const ano  = randInt(1985, 2004);
+    const mes  = randInt(1, 12);
+    const dia  = randInt(1, 28);
+    document.querySelector('[name=data_nascimento]').value =
+        `${ano}-${padZero(mes,2)}-${padZero(dia,2)}`;
+
+    // Nacionalidade
+    document.querySelector('[name=nacionalidade]').value = 'Portuguesa';
+
+    // NIF — 9 dígitos começando por 1 ou 2
+    const nifPrimeiro = rand(['1','2']);
+    let nif = nifPrimeiro;
+    for (let i = 0; i < 8; i++) nif += randInt(0, 9);
+    document.querySelector('[name=nif]').value = nif;
+
+    // CC — formato XXXXXXXXZZ (8 dígitos + 2 letras)
+    let cc = '';
+    for (let i = 0; i < 8; i++) cc += randInt(0, 9);
+    cc += String.fromCharCode(randInt(65,90)) + String.fromCharCode(randInt(65,90));
+    document.querySelector('[name=cc]').value = cc;
+
+    // Telefone — começa por 9
+    let tel = '9' + rand(['1','2','3','6']) + randInt(1000000, 9999999);
+    document.querySelector('[name=telefone]').value = tel;
+
+    // Morada
+    const numPorta = randInt(1, 350);
+    const andar    = rand(['', ' 1º Dto', ' 2º Esq', ' R/C', ' 3º Dto']);
+    document.querySelector('[name=morada]').value = `${rand(ruas)}, ${numPorta}${andar}`;
+
+    // Código postal
+    const cp1 = padZero(randInt(1000, 9999), 4);
+    const cp2 = padZero(randInt(100, 999), 3);
+    document.querySelector('[name=codigo_postal]').value = `${cp1}-${cp2}`;
+
+    // Localidade
+    document.querySelector('[name=localidade]').value = rand(localidades);
+
+    // Curso — selecionar o primeiro disponível se nenhum estiver selecionado
+    const sel = document.querySelector('[name=curso_id]');
+    if (sel && sel.value === '') {
+        const opcoes = sel.querySelectorAll('option[value]:not([value=""])');
+        if (opcoes.length > 0) {
+            sel.value = opcoes[Math.floor(Math.random() * opcoes.length)].value;
+        }
+    }
+}
+</script>
+<?php endif; ?>
 
 <?php
 $content = ob_get_clean();

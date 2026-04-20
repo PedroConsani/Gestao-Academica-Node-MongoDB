@@ -1,0 +1,50 @@
+<h2>Cursos</h2>
+<a href="/gestor/curso/novo" class="btn btn-primary">+ Novo Curso</a>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f1f3f5;">
+            <th style="padding: 10px; text-align: left;">Nome</th>
+            <th style="padding: 10px; text-align: left;">Código</th>
+            <th style="padding: 10px; text-align: left;">Duração (anos)</th>
+            <th style="padding: 10px; text-align: left;">Status</th>
+            <th style="padding: 10px; text-align: center;">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (cursos && cursos.length > 0) { %>
+            <% cursos.forEach(curso => { %>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 10px;"><strong><%= curso.nome %></strong></td>
+                    <td style="padding: 10px;"><%= curso.codigo %></td>
+                    <td style="padding: 10px;"><%= curso.duracao_anos %></td>
+                    <td style="padding: 10px;">
+                        <span style="padding: 5px 10px; border-radius: 5px; 
+                            <%= curso.ativo ? 'background: #d4edda; color: #155724;' : 'background: #f8d7da; color: #721c24;' %>">
+                            <%= curso.ativo ? 'Ativo' : 'Inativo' %>
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center;">
+                        <a href="/gestor/curso/<%= curso._id %>/editar" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">Editar</a>
+                        <button onclick="toggleCurso('<%= curso._id %>')" class="btn btn-secondary" style="font-size: 12px; padding: 5px 10px;">Toggle</button>
+                    </td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="5" style="padding: 20px; text-align: center; color: #999;">Nenhum curso encontrado</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<script>
+function toggleCurso(id) {
+    fetch(`/gestor/curso/${id}/toggle`, { method: 'POST' })
+        .then(r => r.json())
+        .then(data => {
+            if (data.success) location.reload();
+        })
+        .catch(e => alert('Erro: ' + e));
+}
+</script>

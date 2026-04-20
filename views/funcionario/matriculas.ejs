@@ -1,0 +1,55 @@
+<h2>Matrículas Pendentes</h2>
+
+<div style="margin: 20px 0;">
+    <a href="/funcionario/matriculas?estado=pendente" class="btn btn-primary">Pendentes</a>
+    <a href="/funcionario/matriculas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
+    <a href="/funcionario/matriculas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
+    <a href="/funcionario/matriculas" class="btn btn-secondary">Todas</a>
+</div>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f1f3f5;">
+            <th style="padding: 10px; text-align: left;">Aluno</th>
+            <th style="padding: 10px; text-align: left;">Curso</th>
+            <th style="padding: 10px; text-align: left;">Ano Letivo</th>
+            <th style="padding: 10px; text-align: left;">Estado</th>
+            <th style="padding: 10px; text-align: center;">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (matriculas && matriculas.length > 0) { %>
+            <% matriculas.forEach(mat => { %>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 10px;"><%= mat.aluno_id.nome %></td>
+                    <td style="padding: 10px;"><%= mat.curso_id.nome %></td>
+                    <td style="padding: 10px;"><%= mat.ano_letivo %></td>
+                    <td style="padding: 10px;">
+                        <span style="padding: 5px 10px; border-radius: 5px; 
+                            <%= mat.estado === 'aprovada' ? 'background: #d4edda; color: #155724;' : 
+                                mat.estado === 'rejeitada' ? 'background: #f8d7da; color: #721c24;' :
+                                'background: #fff3cd; color: #856404;' %>">
+                            <%= mat.estado %>
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center;">
+                        <% if (mat.estado === 'pendente') { %>
+                            <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
+                                <input type="hidden" name="acao" value="aprovada">
+                                <button type="submit" class="btn btn-success" style="font-size: 12px; padding: 5px 10px;">Aprovar</button>
+                            </form>
+                            <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
+                                <input type="hidden" name="acao" value="rejeitada">
+                                <button type="submit" class="btn btn-danger" style="font-size: 12px; padding: 5px 10px;">Rejeitar</button>
+                            </form>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="5" style="padding: 20px; text-align: center; color: #999;">Nenhuma matrícula encontrada</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>

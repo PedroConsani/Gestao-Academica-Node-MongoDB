@@ -1,0 +1,41 @@
+<h2>Pautas de Avaliação</h2>
+
+<a href="/funcionario/pauta/nova" class="btn btn-primary">+ Nova Pauta</a>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f1f3f5;">
+            <th style="padding: 10px; text-align: left;">UC</th>
+            <th style="padding: 10px; text-align: left;">Curso</th>
+            <th style="padding: 10px; text-align: left;">Ano Letivo</th>
+            <th style="padding: 10px; text-align: left;">Época</th>
+            <th style="padding: 10px; text-align: center;">Status</th>
+            <th style="padding: 10px; text-align: center;">Ações</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (pautas && pautas.length > 0) { %>
+            <% pautas.forEach(pauta => { %>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 10px;"><%= pauta.uc_id.nome %></td>
+                    <td style="padding: 10px;"><%= pauta.curso_id.nome %></td>
+                    <td style="padding: 10px;"><%= pauta.ano_letivo %></td>
+                    <td style="padding: 10px;"><%= pauta.epoca %></td>
+                    <td style="padding: 10px; text-align: center;">
+                        <span style="padding: 5px 10px; border-radius: 5px; 
+                            <%= pauta.fechada ? 'background: #f8d7da; color: #721c24;' : 'background: #d4edda; color: #155724;' %>">
+                            <%= pauta.fechada ? 'Fechada' : 'Aberta' %>
+                        </span>
+                    </td>
+                    <td style="padding: 10px; text-align: center;">
+                        <a href="/funcionario/pauta/<%= pauta._id %>/notas" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">Ver/Editar</a>
+                    </td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="6" style="padding: 20px; text-align: center; color: #999;">Nenhuma pauta encontrada</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>

@@ -1,0 +1,76 @@
+<h2>Validar Ficha de Aluno</h2>
+
+<div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+    <h3>Informações do Aluno</h3>
+    <p><strong>Nome:</strong> <%= ficha.aluno_id.nome %></p>
+    <p><strong>Email:</strong> <%= ficha.aluno_id.email %></p>
+    <p><strong>Curso:</strong> <%= ficha.curso_id ? ficha.curso_id.nome : 'N/A' %></p>
+    <p><strong>Estado Atual:</strong> 
+        <span style="padding: 5px 10px; border-radius: 5px; 
+            <%= ficha.estado === 'aprovada' ? 'background: #d4edda; color: #155724;' : 
+                ficha.estado === 'rejeitada' ? 'background: #f8d7da; color: #721c24;' :
+                ficha.estado === 'submetida' ? 'background: #d1ecf1; color: #0c5460;' :
+                'background: #fff3cd; color: #856404;' %>">
+            <%= ficha.estado %>
+        </span>
+    </p>
+</div>
+
+<h3>Dados Pessoais</h3>
+<table style="width: 100%; margin: 20px 0;">
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Data de Nascimento:</td>
+        <td style="padding: 10px;"><%= ficha.data_nascimento ? new Date(ficha.data_nascimento).toLocaleDateString('pt-PT') : 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">NIF:</td>
+        <td style="padding: 10px;"><%= ficha.nif || 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Cartão de Cidadão:</td>
+        <td style="padding: 10px;"><%= ficha.cc || 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Nacionalidade:</td>
+        <td style="padding: 10px;"><%= ficha.nacionalidade || 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Telefone:</td>
+        <td style="padding: 10px;"><%= ficha.telefone || 'N/A' %></td>
+    </tr>
+</table>
+
+<h3>Morada</h3>
+<table style="width: 100%; margin: 20px 0;">
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Rua:</td>
+        <td style="padding: 10px;"><%= ficha.morada || 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Código Postal:</td>
+        <td style="padding: 10px;"><%= ficha.codigo_postal || 'N/A' %></td>
+    </tr>
+    <tr style="border-bottom: 1px solid #ddd;">
+        <td style="padding: 10px; font-weight: bold;">Localidade:</td>
+        <td style="padding: 10px;"><%= ficha.localidade || 'N/A' %></td>
+    </tr>
+</table>
+
+<% if (ficha.estado === 'submetida') { %>
+    <h3 style="margin-top: 30px;">Decisão</h3>
+    <form method="POST" action="/gestor/ficha/<%= ficha._id %>/validar">
+        <div style="margin-bottom: 15px;">
+            <label for="observacoes">Observações:</label>
+            <textarea id="observacoes" name="observacoes" 
+                      style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px; min-height: 120px;"></textarea>
+        </div>
+
+        <button type="submit" name="acao" value="aprovar" class="btn btn-success" style="margin-right: 10px;">
+            ✓ Aprovar
+        </button>
+        <button type="submit" name="acao" value="rejeitar" class="btn btn-danger">
+            ✗ Rejeitar
+        </button>
+        <a href="/gestor/fichas?estado=submetida" class="btn btn-secondary">Cancelar</a>
+    </form>
+<% } %>

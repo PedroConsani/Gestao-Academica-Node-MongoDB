@@ -10,6 +10,9 @@ $users = [
     ['Aluno',      'aluno@academia.pt',       'aluno123',      'aluno'],
     ['Gestor',     'gestor@academia.pt',       'gestor123',      'gestor'],
     ['Funcionário', 'func@academia.pt',       'func123',      'funcionario'],
+    ['Aluno 2',      'alunoteste2@academia.pt',       'aluno123',      'aluno'],
+    ['Funcionário 2', 'functeste2@academia.pt',       'func123',      'funcionario'],
+    ['Aluno 3',       'aluno3@academia.pt',          'aluno123',     'aluno'],
 ];
 
 $stmt = $pdo->prepare("

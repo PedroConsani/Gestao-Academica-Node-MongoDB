@@ -22,8 +22,7 @@ ob_start(); ?>
 <?php else: ?>
 
     <?php foreach ($matriculas as $m):
-        $ucs    = $ucsPorCurso[$m['curso_id']] ?? [];
-        $numUcs = count($ucs);
+        $numUcs = (int) ($ucsPorCurso[$m['curso_id']] ?? 0);
     ?>
     <div class="card" style="margin-bottom:1.5rem;">
 
@@ -63,6 +62,12 @@ ob_start(); ?>
                         em <?= formatDate($m['decidido_em']) ?>
                     </div>
                 <?php endif; ?>
+                <?php if ($m['estado'] === 'aprovada'): ?>
+                    <div style="margin-top:.75rem;">
+                        <a href="<?= APP_URL ?>/aluno/notas-curso.php?id=<?= $m['curso_id'] ?>"
+                           class="btn btn-primary btn-sm">📊 Ver Notas</a>
+                    </div>
+                <?php endif; ?>
             </div>
         </div>
 
@@ -76,43 +81,6 @@ ob_start(); ?>
             <div class="alert alert-<?= $m['estado'] === 'aprovada' ? 'success' : 'error' ?>" style="margin-bottom:1rem;font-size:.875rem;">
                 <strong>Decisão dos Serviços Académicos:</strong> <?= e($m['observacoes_func']) ?>
             </div>
-        <?php endif; ?>
-
-        <!-- UCs do curso (colapsável) -->
-        <?php if ($numUcs > 0): ?>
-            <details>
-                <summary style="cursor:pointer;font-size:.82rem;font-weight:700;color:var(--crimson);
-                                text-transform:uppercase;letter-spacing:.06em;list-style:none;
-                                display:flex;align-items:center;gap:.4rem;user-select:none;">
-                    <span>▶</span> Ver plano curricular (<?= $numUcs ?> UCs)
-                </summary>
-                <div style="margin-top:1rem;">
-                    <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:.75rem;">
-                        <?php foreach ($ucs as $uc): ?>
-                            <div style="background:var(--bg2);border:1px solid var(--border);
-                                        border-radius:var(--radius);padding:.75rem 1rem;">
-                                <strong style="display:block;font-size:.72rem;font-weight:700;
-                                               color:var(--crimson);text-transform:uppercase;
-                                               letter-spacing:.06em;margin-bottom:.2rem;">
-                                    <?= e($uc['uc_codigo']) ?>
-                                </strong>
-                                <span style="display:block;font-size:.875rem;font-weight:500;
-                                             color:var(--text);margin-bottom:.4rem;line-height:1.3;">
-                                    <?= e($uc['uc_nome']) ?>
-                                </span>
-                                <div style="display:flex;justify-content:space-between;
-                                            font-size:.75rem;color:var(--text-muted);">
-                                    <span style="background:var(--crimson-bg);color:var(--crimson);
-                                                 padding:.1rem .4rem;border-radius:2px;font-weight:700;">
-                                        <?= $uc['creditos'] ?> ECTS
-                                    </span>
-                                    <span>Ano <?= $uc['ano'] ?> · Sem <?= $uc['semestre'] ?></span>
-                                </div>
-                            </div>
-                        <?php endforeach; ?>
-                    </div>
-                </div>
-            </details>
         <?php endif; ?>
 
     </div>

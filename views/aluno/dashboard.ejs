@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - <%= appName %></title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            <%= appName %>
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 style="color: var(--crimson); font-family: 'Playfair Display', serif; margin-bottom: 2rem;">Dashboard - Aluno</h1>
+
+        <!-- Cards de resumo -->
+        <div class="cards-grid">
+            <div class="card">
+                <h3>Minha Ficha</h3>
+                <p style="font-size: 2rem; color: var(--crimson); font-weight: bold; margin: 0.5rem 0;">
+                    <%= ficha ? ficha.estado : 'Não criada' %>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Status atual</p>
+                <a href="/aluno/ficha" class="btn btn-primary" style="margin-top: 1rem;">Ver / Editar</a>
+            </div>
+
+            <div class="card">
+                <h3>Matrículas</h3>
+                <p style="font-size: 2rem; color: var(--crimson); font-weight: bold; margin: 0.5rem 0;">
+                    <%= matriculas.length %>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Total de matrículas</p>
+                <a href="/aluno/matriculas" class="btn btn-primary" style="margin-top: 1rem;">Ver Matrículas</a>
+            </div>
+
+            <div class="card">
+                <h3>Notas</h3>
+                <p style="font-size: 2rem; color: var(--crimson); font-weight: bold; margin: 0.5rem 0;">
+                    <%= notas.length %>
+                </p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Notas registadas</p>
+                <a href="/aluno/notas" class="btn btn-primary" style="margin-top: 1rem;">Ver Notas</a>
+            </div>
+        </div>
+
+        <!-- Tabela de matrículas -->
+        <h2 style="color: var(--crimson); font-family: 'Playfair Display', serif;margin-top: 3rem; margin-bottom: 1.5rem;">Últimas Matrículas</h2>
+        
+        <% if (matriculas.length > 0) { %>
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Curso</th>
+                            <th>Ano Letivo</th>
+                            <th>Estado</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% matriculas.slice(0, 10).forEach(mat => { %>
+                            <tr>
+                                <td><strong><%= mat.curso_id?.nome || 'N/A' %></strong></td>
+                                <td><%= mat.ano_letivo %></td>
+                                <td>
+                                    <% if (mat.estado === 'aprovada') { %>
+                                        <span class="badge badge-success"><%= mat.estado %></span>
+                                    <% } else if (mat.estado === 'rejeitada') { %>
+                                        <span class="badge badge-danger"><%= mat.estado %></span>
+                                    <% } else { %>
+                                        <span class="badge badge-warning"><%= mat.estado %></span>
+                                    <% } %>
+                                </td>
+                                <td>
+                                    <a href="/aluno/matriculas/<%= mat._id %>" class="btn btn-sm btn-secondary">Ver</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    </tbody>
+                </table>
+            </div>
+            <% if (matriculas.length > 10) { %>
+                <p style="text-align: center; margin-top: 1rem;">
+                    <a href="/aluno/matriculas" class="btn btn-secondary">Ver Todas as Matrículas</a>
+                </p>
+            <% } %>
+        <% } else { %>
+            <div class="alert alert-info">
+                Nenhuma matrícula criada ainda. 
+                <a href="/aluno/matricula-nova" style="font-weight: 600;">Criar uma aqui</a>
+            </div>
+        <% } %>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; <%= new Date().getFullYear() %> <%= appName %></p>
+    </footer>
+
+    <style>
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        .table thead {
+            background: var(--bg2);
+        }
+
+        .table th,
+        .table td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .table th {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .table tbody tr:hover {
+            background: var(--bg);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius);
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-success {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-danger {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-warning {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .alert-info {
+            background: var(--info-bg);
+            color: var(--info);
+            border: 1px solid var(--info);
+        }
+    </style>
+</body>
+</html>

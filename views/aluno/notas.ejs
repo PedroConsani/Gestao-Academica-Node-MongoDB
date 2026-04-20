@@ -1,0 +1,36 @@
+<h2>Notas - Detalhes</h2>
+
+<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
+    <thead>
+        <tr style="background: #f1f3f5;">
+            <th style="padding: 10px; text-align: left;">UC</th>
+            <th style="padding: 10px; text-align: left;">Ano Letivo</th>
+            <th style="padding: 10px; text-align: left;">Época</th>
+            <th style="padding: 10px; text-align: center;">Nota</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% if (notas && notas.length > 0) { %>
+            <% notas.forEach(nota => { %>
+                <tr style="border-bottom: 1px solid #dee2e6;">
+                    <td style="padding: 10px;"><strong><%= nota.pauta_id.uc_id.nome %></strong></td>
+                    <td style="padding: 10px;"><%= nota.pauta_id.ano_letivo %></td>
+                    <td style="padding: 10px;"><%= nota.pauta_id.epoca %></td>
+                    <td style="padding: 10px; text-align: center;">
+                        <% if (nota.nota_final !== null) { %>
+                            <strong style="font-size: 18px;"><%= nota.nota_final %></strong>
+                        <% } else { %>
+                            <span style="color: #999;">Não lançada</span>
+                        <% } %>
+                    </td>
+                </tr>
+            <% }); %>
+        <% } else { %>
+            <tr>
+                <td colspan="4" style="padding: 20px; text-align: center; color: #999;">Nenhuma nota encontrada</td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<a href="/aluno/dashboard" class="btn btn-secondary" style="margin-top: 20px;">Voltar</a>

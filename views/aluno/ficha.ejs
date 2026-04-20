@@ -1,0 +1,94 @@
+<h2>Minha Ficha de Aluno</h2>
+
+<% if (typeof error !== 'undefined' && error) { %>
+    <div class="alert alert-error"><%= error %></div>
+<% } %>
+
+<form method="POST" action="/aluno/ficha" enctype="multipart/form-data">
+    <h3>Dados Pessoais</h3>
+
+    <div style="margin-bottom: 15px;">
+        <label for="data_nascimento">Data de Nascimento:</label>
+        <input type="date" id="data_nascimento" name="data_nascimento" 
+               value="<%= ficha && ficha.data_nascimento ? ficha.data_nascimento.toISOString().split('T')[0] : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="nif">NIF:</label>
+        <input type="text" id="nif" name="nif" value="<%= ficha && ficha.nif ? ficha.nif : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="cc">Cartão de Cidadão:</label>
+        <input type="text" id="cc" name="cc" value="<%= ficha && ficha.cc ? ficha.cc : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="nacionalidade">Nacionalidade:</label>
+        <input type="text" id="nacionalidade" name="nacionalidade" value="<%= ficha && ficha.nacionalidade ? ficha.nacionalidade : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="telefone">Telefone:</label>
+        <input type="tel" id="telefone" name="telefone" value="<%= ficha && ficha.telefone ? ficha.telefone : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <h3 style="margin-top: 30px;">Morada</h3>
+
+    <div style="margin-bottom: 15px;">
+        <label for="morada">Morada:</label>
+        <input type="text" id="morada" name="morada" value="<%= ficha && ficha.morada ? ficha.morada : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="codigo_postal">Código Postal:</label>
+        <input type="text" id="codigo_postal" name="codigo_postal" value="<%= ficha && ficha.codigo_postal ? ficha.codigo_postal : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="localidade">Localidade:</label>
+        <input type="text" id="localidade" name="localidade" value="<%= ficha && ficha.localidade ? ficha.localidade : '' %>"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="foto">Foto:</label>
+        <input type="file" id="foto" name="foto" accept="image/*"
+               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+        <% if (ficha && ficha.foto_path) { %>
+            <p style="margin-top: 10px; color: #666;">Foto atual: <strong><%= ficha.foto_path %></strong></p>
+        <% } %>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar Ficha</button>
+
+    <% if (ficha && ficha.estado === 'rascunho') { %>
+        <form method="POST" action="/aluno/ficha/submit" style="display: inline;">
+            <button type="submit" class="btn btn-success">Submeter para Validação</button>
+        </form>
+    <% } %>
+
+    <% if (ficha) { %>
+        <p style="margin-top: 20px; color: #666;">
+            <strong>Estado:</strong> <%= ficha.estado %><br>
+            <% if (ficha.validada_em) { %>
+                <strong>Validada em:</strong> <%= new Date(ficha.validada_em).toLocaleDateString('pt-PT') %><br>
+                <strong>Validada por:</strong> <%= ficha.validada_por ? ficha.validada_por.nome : 'N/A' %>
+            <% } %>
+        </p>
+    <% } %>
+</form>
+
+<style>
+    form { max-width: 600px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    input[type="text"], input[type="email"], input[type="date"], input[type="tel"], input[type="file"] { font-family: inherit; }
+    h3 { margin-top: 30px; margin-bottom: 15px; }
+</style>

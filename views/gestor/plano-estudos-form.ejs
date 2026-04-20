@@ -1,0 +1,69 @@
+<h2>Novo Plano de Estudos</h2>
+
+<form method="POST" action="/gestor/plano">
+    <div style="margin-bottom: 15px;">
+        <label for="curso_id">Curso:</label>
+        <select id="curso_id" name="curso_id" required 
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+            <option value="">Selecione um curso</option>
+            <% if (cursos) { %>
+                <% cursos.forEach(curso => { %>
+                    <option value="<%= curso._id %>"><%= curso.nome %></option>
+                <% }); %>
+            <% } %>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="uc_id">Unidade Curricular:</label>
+        <select id="uc_id" name="uc_id" required 
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+            <option value="">Selecione uma UC</option>
+            <% if (ucs) { %>
+                <% ucs.forEach(uc => { %>
+                    <option value="<%= uc._id %>"><%= uc.nome %></option>
+                <% }); %>
+            <% } %>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="ano">Ano Curricular:</label>
+        <select id="ano" name="ano" required 
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+            <% if (anos) { %>
+                <% anos.forEach(a => { %>
+                    <option value="<%= a %>"><%= a %></option>
+                <% }); %>
+            <% } %>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="semestre">Semestre:</label>
+        <select id="semestre" name="semestre" required 
+                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+            <% if (semestres) { %>
+                <% semestres.forEach(s => { %>
+                    <option value="<%= s %>"><%= s %></option>
+                <% }); %>
+            <% } %>
+        </select>
+    </div>
+
+    <div style="margin-bottom: 15px;">
+        <label for="obrigatoria">
+            <input type="checkbox" id="obrigatoria" name="obrigatoria" checked>
+            Obrigatória
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Guardar</button>
+    <a href="/gestor/plano-estudos" class="btn btn-secondary">Cancelar</a>
+</form>
+
+<style>
+    form { max-width: 600px; }
+    label { font-weight: bold; display: block; margin-bottom: 5px; }
+    select { font-family: inherit; }
+</style>
