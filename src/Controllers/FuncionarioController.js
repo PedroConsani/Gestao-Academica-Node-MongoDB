@@ -180,3 +180,82 @@ export async function showPautaNova(req, res) {
     });
   }
 }
+
+export async function createPauta(req, res) {
+  try {
+    const { uc_id, curso_id, ano_letivo, epoca } = req.body;
+
+    // Validação básica
+    if (!uc_id || !curso_id || !ano_letivo || !epoca) {
+      req.session.flash = { error: 'Todos os campos são obrigatórios' };
+      return res.redirect('/funcionario/pauta/nova');
+    }
+
+    // Verificar se UC e Curso existem
+    const uc = await UnidadeCurricular.findById(uc_id);
+    const curso = await Curso.findById(curso_id);
+
+    if (!uc || !curso) {
+      req.session.flash = { error: 'UC ou Curso não encontrados' };
+      return res.redirect('/funcionario/pauta/nova');
+    }
+
+    // Validar epocas
+    const epocasValidas = ['Normal', 'Recurso', 'Especial'];
+    if (!epocasValidas.includes(epoca)) {
+      req.session.flash = { error: 'Época inválida' };
+      return res.redirect('/funcionario/pauta/nova');
+    }
+
+    // Verificar se pauta já existe
+    const pautaExistente = await Pauta.findOne({
+      uc_id,
+      curso_id,
+      ano_letivo,
+      epoca
+    });
+
+    if (pautaExistente) {
+      req.session.flash = { error: 'Pauta para esta UC, curso, ano e época já existe' };
+      return res.redirect('/funcionario/pauta/nova');
+    }
+
+    // Criar pauta
+    const pauta = new Pauta({
+      uc_id,
+      curso_id,
+      ano_letivo,
+      epoca,
+      criada_por: req.session.user.id,
+      criada_em: new Date(),
+      fechada: false
+    });
+
+    await pauta.save();
+
+    // Buscar alunos inscritos neste curso (só os que têm matrícula aprovada)
+    const matriculas = await Matricula.find({
+      curso_id,
+      ano_letivo,
+      estado: 'aprovada'
+    }).populate('aluno_id');
+
+    // Criar registros de notas para cada aluno
+    for (const matricula of matriculas) {
+      await Nota.create({
+        pauta_id: pauta._id,
+        aluno_id: matricula.aluno_id._id,
+        nota_final: null
+      });
+    }
+
+    req.session.flash = { 
+      success: `Pauta criada com sucesso! ${matriculas.length} alunos adicionados.` 
+    };
+    res.redirect(`/funcionario/pauta/${pauta._id}/notas`);
+  } catch (error) {
+    console.error('Erro ao criar pauta:', error);
+    req.session.flash = { error: 'Erro ao criar pauta' };
+    res.redirect('/funcionario/pauta/nova');
+  }
+}

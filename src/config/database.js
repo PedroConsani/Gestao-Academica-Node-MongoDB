@@ -2,7 +2,11 @@ import mongoose from 'mongoose';
 
 export async function connectDB() {
   try {
-    const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://a34325_db_user:XGoeeF1ij9uPJK3s@cluster0.natvzfv.mongodb.net/academic_system?appName=Cluster0';
+    const mongoUri = process.env.MONGODB_URI;
+    
+    if (!mongoUri) {
+      throw new Error('MONGODB_URI não configurada em .env');
+    }
     
     console.log('🔌 Conectando ao MongoDB...');
     console.log('   URL:', mongoUri.substring(0, 50) + '...');

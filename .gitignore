@@ -6,7 +6,8 @@ public/uploads/photos/*
 
 # Ficheiros de configuração local (com passwords reais)
 config/database.php
-
+node_modules
+.env
 # Logs
 *.log
 

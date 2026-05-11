@@ -1,94 +1,314 @@
-<h2>Minha Ficha de Aluno</h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %> - <%= appName %></title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .form-section {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-section h3 {
+            color: var(--crimson);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid var(--crimson);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: inherit;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--crimson);
+            box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.1);
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .status-rascunho {
+            background-color: #e9ecef;
+            color: #495057;
+        }
+        .status-submetida {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        .status-aprovada {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status-rejeitada {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .form-actions {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #ddd;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary {
+            background-color: var(--crimson);
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #bb2d3b;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+            text-decoration: none;
+        }
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        .info-box {
+            background: #f0f4ff;
+            border-left: 4px solid var(--crimson);
+            padding: 1.5rem;
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+        .info-box strong {
+            color: var(--crimson);
+        }
+        .photo-preview {
+            max-width: 200px;
+            margin-top: 1rem;
+            border-radius: 4px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        small {
+            color: #666;
+            display: block;
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            <%= appName %>
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<% if (typeof error !== 'undefined' && error) { %>
-    <div class="alert alert-error"><%= error %></div>
-<% } %>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        
+        <h1 style="color: var(--crimson); font-family: 'Playfair Display', serif; margin-bottom: 2rem;"><%= title %></h1>
 
-<form method="POST" action="/aluno/ficha" enctype="multipart/form-data">
-    <h3>Dados Pessoais</h3>
+        <% if (ficha) { %>
+            <span class="status-badge status-<%= ficha.estado %>"><%= ficha.estado.toUpperCase() %></span>
+        <% } %>
 
-    <div style="margin-bottom: 15px;">
-        <label for="data_nascimento">Data de Nascimento:</label>
-        <input type="date" id="data_nascimento" name="data_nascimento" 
-               value="<%= ficha && ficha.data_nascimento ? ficha.data_nascimento.toISOString().split('T')[0] : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+        <form method="POST" action="/aluno/ficha" enctype="multipart/form-data">
+            <div class="form-section">
+                <h3>Dados Pessoais</h3>
+                
+                <div class="form-group">
+                    <label for="curso_id">Curso Pretendido: <span style="color: var(--crimson);">*</span></label>
+                    <select id="curso_id" name="curso_id" required>
+                        <option value="">-- Selecione um curso --</option>
+                        <% if (typeof cursos !== 'undefined' && cursos.length > 0) { %>
+                            <% cursos.forEach(curso => { %>
+                                <option value="<%= curso._id %>" <% if (ficha && ficha.curso_id && ficha.curso_id._id == curso._id) { %>selected<% } %>>
+                                    <%= curso.nome %> (<%= curso.codigo %>)
+                                </option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="nif">NIF:</label>
-        <input type="text" id="nif" name="nif" value="<%= ficha && ficha.nif ? ficha.nif : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="data_nascimento">Data de Nascimento:</label>
+                        <input type="date" id="data_nascimento" name="data_nascimento" 
+                               value="<%= ficha && ficha.data_nascimento ? ficha.data_nascimento.toISOString().split('T')[0] : '' %>">
+                    </div>
+                    <div class="form-group">
+                        <label for="nacionalidade">Nacionalidade:</label>
+                        <input type="text" id="nacionalidade" name="nacionalidade" 
+                               value="<%= ficha && ficha.nacionalidade ? ficha.nacionalidade : '' %>"
+                               placeholder="Ex: Portuguesa">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="cc">Cartão de Cidadão:</label>
-        <input type="text" id="cc" name="cc" value="<%= ficha && ficha.cc ? ficha.cc : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nif">NIF:</label>
+                        <input type="text" id="nif" name="nif" 
+                               value="<%= ficha && ficha.nif ? ficha.nif : '' %>"
+                               placeholder="Ex: 123456789">
+                    </div>
+                    <div class="form-group">
+                        <label for="cc">Cartão de Cidadão:</label>
+                        <input type="text" id="cc" name="cc" 
+                               value="<%= ficha && ficha.cc ? ficha.cc : '' %>"
+                               placeholder="Ex: 12345678">
+                    </div>
+                </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="nacionalidade">Nacionalidade:</label>
-        <input type="text" id="nacionalidade" name="nacionalidade" value="<%= ficha && ficha.nacionalidade ? ficha.nacionalidade : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+                <div class="form-group">
+                    <label for="telefone">Telefone:</label>
+                    <input type="tel" id="telefone" name="telefone" 
+                           value="<%= ficha && ficha.telefone ? ficha.telefone : '' %>"
+                           placeholder="Ex: +351 910 123 456">
+                </div>
+            </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="telefone">Telefone:</label>
-        <input type="tel" id="telefone" name="telefone" value="<%= ficha && ficha.telefone ? ficha.telefone : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+            <div class="form-section">
+                <h3>Morada</h3>
+                
+                <div class="form-group">
+                    <label for="morada">Morada:</label>
+                    <input type="text" id="morada" name="morada" 
+                           value="<%= ficha && ficha.morada ? ficha.morada : '' %>"
+                           placeholder="Ex: Rua do Exemplo, nº 123">
+                </div>
 
-    <h3 style="margin-top: 30px;">Morada</h3>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="codigo_postal">Código Postal:</label>
+                        <input type="text" id="codigo_postal" name="codigo_postal" 
+                               value="<%= ficha && ficha.codigo_postal ? ficha.codigo_postal : '' %>"
+                               placeholder="Ex: 1000-001">
+                    </div>
+                    <div class="form-group">
+                        <label for="localidade">Localidade:</label>
+                        <input type="text" id="localidade" name="localidade" 
+                               value="<%= ficha && ficha.localidade ? ficha.localidade : '' %>"
+                               placeholder="Ex: Lisboa">
+                    </div>
+                </div>
+            </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="morada">Morada:</label>
-        <input type="text" id="morada" name="morada" value="<%= ficha && ficha.morada ? ficha.morada : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+            <div class="form-section">
+                <h3>Fotografia</h3>
+                
+                <div class="form-group">
+                    <label for="foto">Upload de Fotografia:</label>
+                    <input type="file" id="foto" name="foto" accept="image/jpeg,image/png">
+                    <small>Formatos aceitos: JPG, PNG. Tamanho máximo: 2MB</small>
+                    <% if (ficha && ficha.foto_path) { %>
+                        <div style="margin-top: 1rem;">
+                            <strong>Fotografia atual:</strong><br>
+                            <img src="<%= ficha.foto_path %>" alt="Foto" class="photo-preview">
+                        </div>
+                    <% } %>
+                </div>
+            </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="codigo_postal">Código Postal:</label>
-        <input type="text" id="codigo_postal" name="codigo_postal" value="<%= ficha && ficha.codigo_postal ? ficha.codigo_postal : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">💾 Guardar Ficha</button>
+                <% if (ficha && ficha.estado === 'rascunho') { %>
+                    <button type="button" class="btn btn-success" onclick="submitForm()">📤 Submeter para Validação</button>
+                <% } %>
+                <a href="/aluno/dashboard" class="btn btn-secondary">← Voltar</a>
+            </div>
+        </form>
 
-    <div style="margin-bottom: 15px;">
-        <label for="localidade">Localidade:</label>
-        <input type="text" id="localidade" name="localidade" value="<%= ficha && ficha.localidade ? ficha.localidade : '' %>"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="foto">Foto:</label>
-        <input type="file" id="foto" name="foto" accept="image/*"
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-        <% if (ficha && ficha.foto_path) { %>
-            <p style="margin-top: 10px; color: #666;">Foto atual: <strong><%= ficha.foto_path %></strong></p>
+        <% if (ficha && (ficha.validada_em || ficha.observacoes)) { %>
+            <div class="info-box">
+                <% if (ficha.validada_em) { %>
+                    <div style="margin-bottom: 1rem;">
+                        <strong>✓ Validada em:</strong> <%= new Date(ficha.validada_em).toLocaleDateString('pt-PT') %><br>
+                        <strong>Validada por:</strong> <%= ficha.validada_por ? ficha.validada_por.nome : 'N/A' %>
+                    </div>
+                <% } %>
+                <% if (ficha.observacoes) { %>
+                    <div>
+                        <strong>Observações:</strong><br>
+                        <%= ficha.observacoes %>
+                    </div>
+                <% } %>
+            </div>
         <% } %>
     </div>
 
-    <button type="submit" class="btn btn-primary">Guardar Ficha</button>
-
-    <% if (ficha && ficha.estado === 'rascunho') { %>
-        <form method="POST" action="/aluno/ficha/submit" style="display: inline;">
-            <button type="submit" class="btn btn-success">Submeter para Validação</button>
-        </form>
-    <% } %>
-
-    <% if (ficha) { %>
-        <p style="margin-top: 20px; color: #666;">
-            <strong>Estado:</strong> <%= ficha.estado %><br>
-            <% if (ficha.validada_em) { %>
-                <strong>Validada em:</strong> <%= new Date(ficha.validada_em).toLocaleDateString('pt-PT') %><br>
-                <strong>Validada por:</strong> <%= ficha.validada_por ? ficha.validada_por.nome : 'N/A' %>
-            <% } %>
-        </p>
-    <% } %>
-</form>
-
-<style>
-    form { max-width: 600px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    input[type="text"], input[type="email"], input[type="date"], input[type="tel"], input[type="file"] { font-family: inherit; }
-    h3 { margin-top: 30px; margin-bottom: 15px; }
-</style>
+    <script>
+        function submitForm() {
+            if (confirm('Tem a certeza que deseja submeter a ficha para validação? Não poderá editar os dados após submissão.')) {
+                const form = document.querySelector('form');
+                const submitUrl = form.action.replace('/ficha', '/ficha/submit');
+                
+                const formData = new FormData(form);
+                
+                fetch(submitUrl, {
+                    method: 'POST',
+                    body: formData
+                }).then(response => {
+                    if (response.ok) {
+                        window.location.reload();
+                    } else {
+                        alert('Erro ao submeter ficha');
+                    }
+                }).catch(error => {
+                    console.error('Error:', error);
+                    alert('Erro ao submeter ficha');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

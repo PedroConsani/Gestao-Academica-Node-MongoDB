@@ -3,6 +3,7 @@ import Matricula from '../models/Matricula.js';
 import Pauta from '../models/Pauta.js';
 import Nota from '../models/Nota.js';
 import Utilizador from '../models/Utilizador.js';
+import Curso from '../models/Curso.js';
 
 export async function dashboard(req, res) {
   try {
@@ -48,9 +49,13 @@ export async function showFicha(req, res) {
       ficha = await FichaAluno.create({ aluno_id: userId });
     }
 
+    // Buscar cursos ativos para o dropdown
+    const cursos = await Curso.find({ ativo: true }).select('_id nome codigo descricao');
+
     res.render('aluno/ficha', {
       title: 'Minha Ficha',
-      ficha
+      ficha,
+      cursos
     });
   } catch (error) {
     console.error('Erro ao carregar ficha:', error);
@@ -199,6 +204,111 @@ export async function createMatricula(req, res) {
     res.status(500).render('error', { 
       title: 'Erro', 
       message: 'Erro ao criar matrícula' 
+    });
+  }
+}
+
+export async function listNotas(req, res) {
+  try {
+    const userId = req.session.user.id;
+    
+    // Buscar todas as notas do aluno
+    const notas = await Nota.find({ aluno_id: userId })
+      .populate({
+        path: 'pauta_id',
+        select: 'uc_id ano_letivo epoca',
+        populate: {
+          path: 'uc_id',
+          select: 'nome codigo creditos'
+        }
+      })
+      .sort({ 'pauta_id.ano_letivo': -1 });
+
+    // Agrupar por UC para melhor visualização
+    const notasPorUC = {};
+    notas.forEach(nota => {
+      if (nota.pauta_id && nota.pauta_id.uc_id) {
+        const ucId = nota.pauta_id.uc_id._id;
+        if (!notasPorUC[ucId]) {
+          notasPorUC[ucId] = {
+            uc: nota.pauta_id.uc_id,
+            notas: []
+          };
+        }
+        notasPorUC[ucId].notas.push(nota);
+      }
+    });
+
+    res.render('aluno/notas', {
+      title: 'Minhas Notas',
+      notas,
+      notasPorUC,
+      totalNotas: notas.length
+    });
+  } catch (error) {
+    console.error('Erro ao listar notas:', error);
+    res.status(500).render('error', { 
+      title: 'Erro', 
+      message: 'Erro ao carregar notas' 
+    });
+  }
+}
+
+export async function showNotasCurso(req, res) {
+  try {
+    const userId = req.session.user.id;
+    const { id: cursoId } = req.params;
+
+    // Verificar se aluno está matriculado neste curso
+    const matricula = await Matricula.findOne({
+      aluno_id: userId,
+      curso_id: cursoId,
+      estado: 'aprovada'
+    }).populate('curso_id', 'nome codigo');
+
+    if (!matricula) {
+      return res.status(404).render('error', { 
+        title: 'Erro', 
+        message: 'Você não está matriculado neste curso' 
+      });
+    }
+
+    // Buscar notas deste aluno neste curso
+    const notas = await Nota.find({ aluno_id: userId })
+      .populate({
+        path: 'pauta_id',
+        select: 'uc_id ano_letivo epoca curso_id',
+        populate: {
+          path: 'uc_id',
+          select: 'nome codigo creditos'
+        }
+      })
+      .sort({ 'pauta_id.ano_letivo': -1 });
+
+    // Filtrar notas só do curso atual
+    const notasCurso = notas.filter(nota => 
+      nota.pauta_id && nota.pauta_id.curso_id && 
+      nota.pauta_id.curso_id.toString() === cursoId
+    );
+
+    // Calcular média
+    const notasValidas = notasCurso.filter(n => n.nota_final !== null && n.nota_final !== undefined);
+    const media = notasValidas.length > 0 
+      ? (notasValidas.reduce((sum, n) => sum + n.nota_final, 0) / notasValidas.length).toFixed(2)
+      : null;
+
+    res.render('aluno/notas-curso', {
+      title: `Notas - ${matricula.curso_id.nome}`,
+      curso: matricula.curso_id,
+      notas: notasCurso,
+      media,
+      totalNotas: notasValidas.length
+    });
+  } catch (error) {
+    console.error('Erro ao carregar notas do curso:', error);
+    res.status(500).render('error', { 
+      title: 'Erro', 
+      message: 'Erro ao carregar notas do curso' 
     });
   }
 }
