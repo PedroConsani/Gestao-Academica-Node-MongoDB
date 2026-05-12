@@ -1,69 +1,108 @@
-<h2>Novo Plano de Estudos</h2>
-
-<form method="POST" action="/gestor/plano">
-    <div style="margin-bottom: 15px;">
-        <label for="curso_id">Curso:</label>
-        <select id="curso_id" name="curso_id" required 
-                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-            <option value="">Selecione um curso</option>
-            <% if (cursos) { %>
-                <% cursos.forEach(curso => { %>
-                    <option value="<%= curso._id %>"><%= curso.nome %></option>
-                <% }); %>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Plano de Estudos - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
             <% } %>
-        </select>
-    </div>
+        </div>
+    </nav>
 
-    <div style="margin-bottom: 15px;">
-        <label for="uc_id">Unidade Curricular:</label>
-        <select id="uc_id" name="uc_id" required 
-                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-            <option value="">Selecione uma UC</option>
-            <% if (ucs) { %>
-                <% ucs.forEach(uc => { %>
-                    <option value="<%= uc._id %>"><%= uc.nome %></option>
-                <% }); %>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Curricular</p>
+                <h1>Novo Plano de Estudos</h1>
+            </div>
+        </div>
+
+        <div class="card" style="max-width: 700px;">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger"><%= error %></div>
             <% } %>
-        </select>
+
+            <form method="POST" action="/gestor/plano">
+                <div class="form-group">
+                    <label for="curso_id">Curso *</label>
+                    <select id="curso_id" name="curso_id" required>
+                        <option value="">Selecione um curso</option>
+                        <% if (cursos) { %>
+                            <% cursos.forEach(curso => { %>
+                                <option value="<%= curso._id %>"><%= curso.nome %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="uc_id">Unidade Curricular *</label>
+                    <select id="uc_id" name="uc_id" required>
+                        <option value="">Selecione uma UC</option>
+                        <% if (ucs) { %>
+                            <% ucs.forEach(uc => { %>
+                                <option value="<%= uc._id %>"><%= uc.nome %></option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="ano">Ano Curricular *</label>
+                        <select id="ano" name="ano" required>
+                            <option value="">Selecione</option>
+                            <% if (anos) { %>
+                                <% anos.forEach(a => { %>
+                                    <option value="<%= a %>"><%= a %>º Ano</option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="semestre">Semestre *</label>
+                        <select id="semestre" name="semestre" required>
+                            <option value="">Selecione</option>
+                            <% if (semestres) { %>
+                                <% semestres.forEach(s => { %>
+                                    <option value="<%= s %>"><%= s %>º Semestre</option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="obrigatoria">
+                        <input type="checkbox" id="obrigatoria" name="obrigatoria" checked style="margin-right: 0.5rem;">
+                        <span>Marcar como obrigatória</span>
+                    </label>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="/gestor/plano-estudos" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="ano">Ano Curricular:</label>
-        <select id="ano" name="ano" required 
-                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-            <% if (anos) { %>
-                <% anos.forEach(a => { %>
-                    <option value="<%= a %>"><%= a %></option>
-                <% }); %>
-            <% } %>
-        </select>
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="semestre">Semestre:</label>
-        <select id="semestre" name="semestre" required 
-                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-            <% if (semestres) { %>
-                <% semestres.forEach(s => { %>
-                    <option value="<%= s %>"><%= s %></option>
-                <% }); %>
-            <% } %>
-        </select>
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="obrigatoria">
-            <input type="checkbox" id="obrigatoria" name="obrigatoria" checked>
-            Obrigatória
-        </label>
-    </div>
-
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a href="/gestor/plano-estudos" class="btn btn-secondary">Cancelar</a>
-</form>
-
-<style>
-    form { max-width: 600px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    select { font-family: inherit; }
-</style>
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

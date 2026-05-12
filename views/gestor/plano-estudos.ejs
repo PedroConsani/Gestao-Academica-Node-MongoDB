@@ -1,36 +1,82 @@
-<h2>Plano de Estudos</h2>
-<a href="/gestor/plano/novo" class="btn btn-primary">+ Novo Plano</a>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plano de Estudos - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-    <thead>
-        <tr style="background: #f1f3f5;">
-            <th style="padding: 10px; text-align: left;">Curso</th>
-            <th style="padding: 10px; text-align: left;">UC</th>
-            <th style="padding: 10px; text-align: left;">Ano</th>
-            <th style="padding: 10px; text-align: left;">Semestre</th>
-            <th style="padding: 10px; text-align: center;">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if (planos && planos.length > 0) { %>
-            <% planos.forEach(plano => { %>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px;"><%= plano.curso_id.nome %></td>
-                    <td style="padding: 10px;"><%= plano.uc_id.nome %></td>
-                    <td style="padding: 10px; text-align: center;"><%= plano.ano %></td>
-                    <td style="padding: 10px; text-align: center;"><%= plano.semestre %></td>
-                    <td style="padding: 10px; text-align: center;">
-                        <form method="POST" action="/gestor/plano/<%= plano._id %>/remover" style="display: inline;">
-                            <button type="submit" class="btn btn-danger" style="font-size: 12px; padding: 5px 10px;" 
-                                    onclick="return confirm('Deseja remover este plano?');">Remover</button>
-                        </form>
-                    </td>
-                </tr>
-            <% }); %>
-        <% } else { %>
-            <tr>
-                <td colspan="5" style="padding: 20px; text-align: center; color: #999;">Nenhum plano encontrado</td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Curricular</p>
+                <h1>Plano de Estudos</h1>
+            </div>
+            <a href="/gestor/plano/novo" class="btn btn-primary">+ Novo Plano</a>
+        </div>
+
+        <!-- Tabela de Planos -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Curso</th>
+                        <th>UC</th>
+                        <th style="text-align: center;">Ano</th>
+                        <th style="text-align: center;">Semestre</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (planos && planos.length > 0) { %>
+                        <% planos.forEach(plano => { %>
+                            <tr>
+                                <td><strong><%= plano.curso_id.nome %></strong></td>
+                                <td><%= plano.uc_id.nome %></td>
+                                <td style="text-align: center;">
+                                    <span style="background: var(--crimson-bg); padding: 4px 8px; border-radius: 3px; font-weight: 600; color: var(--crimson);"><%= plano.ano %>º</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <span style="background: var(--gold-light); padding: 4px 8px; border-radius: 3px; font-weight: 600;"><%= plano.semestre %>º</span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <form method="POST" action="/gestor/plano/<%= plano._id %>/remover" style="display: inline;">
+                                        <button type="submit" class="btn btn-danger btn-sm" 
+                                                onclick="return confirm('Tem certeza que deseja remover este plano?');">Remover</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhum plano encontrado</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/gestor/dashboard" class="btn btn-secondary" style="margin-top: 2rem;">Voltar</a>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

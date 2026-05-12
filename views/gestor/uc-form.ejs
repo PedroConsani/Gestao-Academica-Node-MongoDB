@@ -1,40 +1,73 @@
-<h2><%= uc ? 'Editar UC' : 'Nova UC' %></h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= uc ? 'Editar' : 'Nova' %> UC - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<form method="POST" action="<%= uc ? `/gestor/uc/${uc._id}` : '/gestor/uc' %>">
-    <div style="margin-bottom: 15px;">
-        <label for="nome">Nome da UC:</label>
-        <input type="text" id="nome" name="nome" value="<%= uc ? uc.nome : '' %>" required 
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Curricular</p>
+                <h1><%= uc ? 'Editar UC' : 'Nova UC' %></h1>
+            </div>
+        </div>
+
+        <div class="card" style="max-width: 700px;">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+
+            <form method="POST" action="<%= uc ? `/gestor/uc/${uc._id}` : '/gestor/uc' %>">
+                <div class="form-group">
+                    <label for="nome">Nome da UC *</label>
+                    <input type="text" id="nome" name="nome" value="<%= uc ? uc.nome : '' %>" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="codigo">Código *</label>
+                    <input type="text" id="codigo" name="codigo" value="<%= uc ? uc.codigo : '' %>" required 
+                           pattern="[A-Z0-9-]+" placeholder="ex: PROG1">
+                </div>
+
+                <div class="form-group">
+                    <label for="creditos">Créditos *</label>
+                    <input type="number" id="creditos" name="creditos" value="<%= uc ? uc.creditos : 6 %>" 
+                           min="0" max="100" step="0.5" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="descricao">Descrição (opcional)</label>
+                    <textarea id="descricao" name="descricao" placeholder="Descreva a unidade curricular..."><%= uc ? uc.descricao || '' : '' %></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    <a href="/gestor/ucs" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="codigo">Código:</label>
-        <input type="text" id="codigo" name="codigo" value="<%= uc ? uc.codigo : '' %>" required 
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="creditos">Créditos:</label>
-        <input type="number" id="creditos" name="creditos" value="<%= uc ? uc.creditos : 6 %>" step="0.5" 
-               style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="descricao">Descrição:</label>
-        <textarea id="descricao" name="descricao" 
-                  style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px; min-height: 100px;"><%= uc ? uc.descricao || '' : '' %></textarea>
-    </div>
-
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error"><%= error %></div>
-    <% } %>
-
-    <button type="submit" class="btn btn-primary">Guardar</button>
-    <a href="/gestor/ucs" class="btn btn-secondary">Cancelar</a>
-</form>
-
-<style>
-    form { max-width: 600px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    input, textarea { font-family: inherit; }
-</style>
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>
