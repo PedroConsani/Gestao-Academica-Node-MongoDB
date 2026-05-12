@@ -94,12 +94,10 @@ export async function listPautas(req, res) {
       .lean();
 
     // Alguns registos podem estar com referências inválidas (uc_id/curso_id ausentes).
-    // Para não quebrar o EJS, removemos apenas os casos incompletos.
-    const pautasFiltradas = (pautas || []).filter(p => p?.uc_id && p?.curso_id);
-
+    // Mantemos todas as pautas e deixamos o EJS mostrar "N/A" quando o populate não resolver.
     res.render('funcionario/pautas', {
       title: 'Pautas',
-      pautas: pautasFiltradas
+      pautas: pautas || []
     });
   } catch (error) {
     console.error('Erro ao listar pautas:', error);
@@ -130,10 +128,14 @@ export async function showPautaNotas(req, res) {
       .populate('aluno_id', 'nome email')
       .populate('editado_por', 'nome');
 
+    const pautaResumo = req.session.pautaResumo;
+    delete req.session.pautaResumo;
+
     res.render('funcionario/pauta-notas', {
       title: 'Ver Notas',
       pauta,
-      notas
+      notas,
+      pautaResumo: pautaResumo || null
     });
   } catch (error) {
     console.error('Erro ao carregar pauta:', error);
@@ -190,12 +192,60 @@ export async function showPautaNova(req, res) {
 export async function createPauta(req, res) {
   try {
     const { uc_id, curso_id, ano_letivo, epoca } = req.body;
+    console.log('[createPauta] body:', { uc_id, curso_id, ano_letivo, epoca });
 
-    // Validação básica
-    if (!uc_id || !curso_id || !ano_letivo || !epoca) {
+
+    // Validação básica (também cobre null/undefined)
+    if (
+      uc_id == null ||
+      curso_id == null ||
+      ano_letivo == null ||
+      epoca == null ||
+      String(uc_id).trim() === '' ||
+      String(curso_id).trim() === '' ||
+      String(ano_letivo).trim() === '' ||
+      String(epoca).trim() === ''
+    ) {
+      console.error('[createPauta] campos inválidos (raw req.body):', {
+        uc_id,
+        curso_id,
+        ano_letivo,
+        epoca,
+        keys: req?.body ? Object.keys(req.body) : [],
+        types: {
+          uc_id: typeof uc_id,
+          curso_id: typeof curso_id,
+          ano_letivo: typeof ano_letivo,
+          epoca: typeof epoca
+        }
+      });
       req.session.flash = { error: 'Todos os campos são obrigatórios' };
       return res.redirect('/funcionario/pauta/nova');
     }
+
+
+    // Normalizar para strings (evita valores inesperados vindos do formulário)
+    const ucIdNorm = String(uc_id);
+    const cursoIdNorm = String(curso_id);
+    const anoLetivoNorm = String(ano_letivo);
+    const epocaNorm = String(epoca);
+
+    // Validações explícitas para impedir que chegue null ao índice unique
+    const anoRegex = /^\d{4}\/\d{4}$/;
+    const epocasValidas = ['Normal', 'Recurso', 'Especial'];
+
+    if (!anoRegex.test(anoLetivoNorm) || !epocasValidas.includes(epocaNorm)) {
+      req.session.flash = { error: 'Ano letivo ou época inválidos' };
+      return res.redirect('/funcionario/pauta/nova');
+    }
+
+    // Usar valores normalizados daqui para a frente
+    const uc_id_norm = ucIdNorm;
+    const curso_id_norm = cursoIdNorm;
+    const ano_letivo_norm = anoLetivoNorm;
+    const epoca_norm = epocaNorm;
+
+
 
     // Verificar se UC e Curso existem
     const uc = await UnidadeCurricular.findById(uc_id);
@@ -206,32 +256,75 @@ export async function createPauta(req, res) {
       return res.redirect('/funcionario/pauta/nova');
     }
 
-    // Validar epocas
-    const epocasValidas = ['Normal', 'Recurso', 'Especial'];
-    if (!epocasValidas.includes(epoca)) {
+    // Validar epocas (já validada acima com normalização)
+    if (!['Normal', 'Recurso', 'Especial'].includes(epocaNorm)) {
       req.session.flash = { error: 'Época inválida' };
       return res.redirect('/funcionario/pauta/nova');
     }
 
+
     // Verificar se pauta já existe
+    // Importante: usa os valores normalizados (evita null/undefined parar no índice unique)
     const pautaExistente = await Pauta.findOne({
-      uc_id,
+      uc_id: uc_id_norm,
+      curso_id: curso_id_norm,
+      ano_letivo: ano_letivo_norm,
+      epoca: epoca_norm
+    }).lean();
+
+
+    // Se já existe, não bloqueamos o fluxo: garantimos/atualizamos apenas as notas.
+    if (pautaExistente) {
+      const pauta = await Pauta.findById(pautaExistente._id);
+    const matriculas = await Matricula.find({
       curso_id,
       ano_letivo,
-      epoca
-    });
+      estado: { $in: ['pendente', 'aprovada'] }
+    }).populate('aluno_id');
 
-    if (pautaExistente) {
-      req.session.flash = { error: 'Pauta para esta UC, curso, ano e época já existe' };
+      // Resumo para visualização imediata após criar/garantir notas
+      req.session.pautaResumo = {
+        pautaId: String(pauta._id),
+        ucId: String(pauta.uc_id ?? uc_id_norm),
+        cursoId: String(pauta.curso_id ?? curso_id_norm),
+        anoLetivo: pauta.ano_letivo,
+        epoca: pauta.epoca,
+        alunos: matriculas.length
+      };
+
+      for (const matricula of matriculas) {
+        if (!matricula?.aluno_id?._id) {
+          throw new Error('Matrícula sem aluno_id populado ao criar notas');
+        }
+
+        await Nota.findOneAndUpdate(
+          { pauta_id: pauta._id, aluno_id: matricula.aluno_id._id },
+          { $setOnInsert: { nota_final: null } },
+          { upsert: true, new: false }
+        );
+      }
+
+      req.session.flash = {
+        success: `Pauta já existia. Notas garantidas para ${matriculas.length} alunos.`
+      };
+      return res.redirect(`/funcionario/pauta/${pauta._id}/notas`);
+    }
+
+
+
+    // Criar pauta
+    // Proteção extra: nunca inserir no índice unique com uc/curso/ano_letivo inválidos.
+    if (!uc_id_norm || !curso_id_norm || !ano_letivo_norm) {
+      req.session.flash = { error: 'Dados inválidos para criar pauta' };
       return res.redirect('/funcionario/pauta/nova');
     }
 
-    // Criar pauta
     const pauta = new Pauta({
-      uc_id,
-      curso_id,
-      ano_letivo,
-      epoca,
+      uc_id: uc_id_norm,
+      curso_id: curso_id_norm,
+      ano_letivo: ano_letivo_norm,
+      epoca: epoca_norm,
+
       criada_por: req.session.user.id,
       criada_em: new Date(),
       fechada: false
@@ -239,11 +332,12 @@ export async function createPauta(req, res) {
 
     await pauta.save();
 
+
     // Buscar alunos inscritos neste curso (só os que têm matrícula aprovada)
     const matriculas = await Matricula.find({
       curso_id,
       ano_letivo,
-      estado: 'aprovada'
+      estado: { $in: ['pendente', 'aprovada'] }
     }).populate('aluno_id');
 
     // Criar registros de notas para cada aluno (idempotente para evitar colisões do índice unique)
@@ -260,6 +354,16 @@ export async function createPauta(req, res) {
     }
 
 
+    // Resumo para visualização imediata após criação
+    req.session.pautaResumo = {
+      pautaId: String(pauta._id),
+      ucId: String(pauta.uc_id ?? uc_id_norm),
+      cursoId: String(pauta.curso_id ?? curso_id_norm),
+      anoLetivo: pauta.ano_letivo,
+      epoca: pauta.epoca,
+      alunos: matriculas.length
+    };
+
     req.session.flash = { 
       success: `Pauta criada com sucesso! ${matriculas.length} alunos adicionados.` 
     };
@@ -270,9 +374,11 @@ export async function createPauta(req, res) {
     console.error('Erro ao criar pauta:', { message, stack: error?.stack, code: error?.code });
 
     // Se for erro de chave duplicada, dá um feedback melhor
+    // Inclui também o message original (curto) para identificarmos qual coleção/índice está duplicando.
     const flashError = message.toLowerCase().includes('duplicate key')
-      ? 'Já existe uma pauta/nota para os mesmos dados (duplicado). Tente novamente.'
+      ? `Duplicado: ${message}`
       : `Erro ao criar pauta: ${message}`;
+
 
     req.session.flash = { error: flashError };
     res.redirect('/funcionario/pauta/nova');

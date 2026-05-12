@@ -148,7 +148,21 @@
     <div class="container">
         <%- include('../shared/flash'); %>
         
-        <h1 style="color: var(--crimson); font-family: 'Playfair Display', serif; margin-bottom: 2rem;">Editar Notas da Pauta</h1>
+        <h1 style="color: var(--crimson); font-family: 'Playfair Display', serif; margin-bottom: 1.5rem;">Editar Notas da Pauta</h1>
+
+        <% if (pautaResumo) { %>
+          <div style="background: #fff3cd; border-left: 6px solid #ffc107; padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.06);">
+            <div style="font-weight: 700; color: #856404; margin-bottom: .5rem;">Resumo da Pauta (recém-criada)</div>
+            <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: .75rem;">
+              <div><strong>UC:</strong> <%= pautaResumo.ucId || 'N/A' %></div>
+              <div><strong>Curso:</strong> <%= pautaResumo.cursoId || 'N/A' %></div>
+              <div><strong>Ano letivo:</strong> <%= pautaResumo.anoLetivo || 'N/A' %></div>
+              <div><strong>Época:</strong> <%= pautaResumo.epoca || 'N/A' %></div>
+              <div><strong>Alunos:</strong> <%= pautaResumo.alunos ?? 0 %></div>
+            </div>
+          </div>
+        <% } %>
+
 
         <div class="pauta-header">
             <div class="pauta-info">

@@ -44,9 +44,14 @@
                     <% if (notas && notas.length > 0) { %>
                         <% notas.forEach(nota => { %>
                             <tr>
-                                <td><strong><%= nota.pauta_id.uc_id.nome %></strong></td>
-                                <td><%= nota.pauta_id.ano_letivo %></td>
-                                <td><%= nota.pauta_id.epoca %></td>
+                                <td>
+                                    <strong>
+                                        <%= nota?.pauta_id?.uc_id?.nome || 'N/A' %>
+                                    </strong>
+                                </td>
+                                <td><%= nota?.pauta_id?.ano_letivo || 'N/A' %></td>
+                                <td><%= nota?.pauta_id?.epoca || 'N/A' %></td>
+
                                 <td style="text-align: center;">
                                     <% if (nota.nota_final !== null) { %>
                                         <strong style="font-size: 1.1rem; color: var(--crimson);"><%= nota.nota_final %></strong>
