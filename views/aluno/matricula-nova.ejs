@@ -1,41 +1,75 @@
-<h2>Nova Matrícula</h2>
-
-<form method="POST" action="/aluno/matricula">
-    <div style="margin-bottom: 15px;">
-        <label for="curso_id">Curso:</label>
-        <select id="curso_id" name="curso_id" required 
-                style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-            <option value="">Selecione um curso</option>
-            <% if (cursos) { %>
-                <% cursos.forEach(curso => { %>
-                    <option value="<%= curso._id %>"><%= curso.nome %> (<%= curso.codigo %>)</option>
-                <% }); %>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova Matrícula - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
             <% } %>
-        </select>
+        </div>
+    </nav>
+
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Matrículas</p>
+                <h1>Solicitar Nova Matrícula</h1>
+            </div>
+        </div>
+
+        <div class="card" style="max-width: 700px;">
+            <% if (typeof error !== 'undefined' && error) { %>
+                <div class="alert alert-danger"><%= error %></div>
+            <% } %>
+
+            <form method="POST" action="/aluno/matricula">
+                <div class="form-group">
+                    <label for="curso_id">Curso *</label>
+                    <select id="curso_id" name="curso_id" required>
+                        <option value="">Selecione um curso</option>
+                        <% if (cursos) { %>
+                            <% cursos.forEach(curso => { %>
+                                <option value="<%= curso._id %>"><%= curso.nome %> (<%= curso.codigo %>)</option>
+                            <% }); %>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="ano_letivo">Ano Letivo *</label>
+                    <input type="text" id="ano_letivo" name="ano_letivo" placeholder="ex: 2024/2025" 
+                           pattern="\d{4}/\d{4}" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="observacoes_aluno">Observações (opcional)</label>
+                    <textarea id="observacoes_aluno" name="observacoes_aluno" 
+                              placeholder="Escreva qualquer observação relevante..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">Solicitar Matrícula</button>
+                    <a href="/aluno/matriculas" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
     </div>
 
-    <div style="margin-bottom: 15px;">
-        <label for="ano_letivo">Ano Letivo:</label>
-        <input type="text" id="ano_letivo" name="ano_letivo" placeholder="ex: 2024/2025" 
-               pattern="\d{4}/\d{4}" required style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px;">
-    </div>
-
-    <div style="margin-bottom: 15px;">
-        <label for="observacoes_aluno">Observações (opcional):</label>
-        <textarea id="observacoes_aluno" name="observacoes_aluno" 
-                  style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; margin-top: 5px; min-height: 100px;"></textarea>
-    </div>
-
-    <% if (typeof error !== 'undefined' && error) { %>
-        <div class="alert alert-error"><%= error %></div>
-    <% } %>
-
-    <button type="submit" class="btn btn-primary">Solicitar Matrícula</button>
-    <a href="/aluno/matriculas" class="btn btn-secondary">Cancelar</a>
-</form>
-
-<style>
-    form { max-width: 600px; }
-    label { font-weight: bold; display: block; margin-bottom: 5px; }
-    select, textarea { font-family: inherit; }
-</style>
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

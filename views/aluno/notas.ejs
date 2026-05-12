@@ -1,36 +1,75 @@
-<h2>Notas - Detalhes</h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notas - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-    <thead>
-        <tr style="background: #f1f3f5;">
-            <th style="padding: 10px; text-align: left;">UC</th>
-            <th style="padding: 10px; text-align: left;">Ano Letivo</th>
-            <th style="padding: 10px; text-align: left;">Época</th>
-            <th style="padding: 10px; text-align: center;">Nota</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if (notas && notas.length > 0) { %>
-            <% notas.forEach(nota => { %>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px;"><strong><%= nota.pauta_id.uc_id.nome %></strong></td>
-                    <td style="padding: 10px;"><%= nota.pauta_id.ano_letivo %></td>
-                    <td style="padding: 10px;"><%= nota.pauta_id.epoca %></td>
-                    <td style="padding: 10px; text-align: center;">
-                        <% if (nota.nota_final !== null) { %>
-                            <strong style="font-size: 18px;"><%= nota.nota_final %></strong>
-                        <% } else { %>
-                            <span style="color: #999;">Não lançada</span>
-                        <% } %>
-                    </td>
-                </tr>
-            <% }); %>
-        <% } else { %>
-            <tr>
-                <td colspan="4" style="padding: 20px; text-align: center; color: #999;">Nenhuma nota encontrada</td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Meu Desempenho</p>
+                <h1>Notas - Detalhes</h1>
+            </div>
+        </div>
 
-<a href="/aluno/dashboard" class="btn btn-secondary" style="margin-top: 20px;">Voltar</a>
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>UC</th>
+                        <th>Ano Letivo</th>
+                        <th>Época</th>
+                        <th style="text-align: center;">Nota</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (notas && notas.length > 0) { %>
+                        <% notas.forEach(nota => { %>
+                            <tr>
+                                <td><strong><%= nota.pauta_id.uc_id.nome %></strong></td>
+                                <td><%= nota.pauta_id.ano_letivo %></td>
+                                <td><%= nota.pauta_id.epoca %></td>
+                                <td style="text-align: center;">
+                                    <% if (nota.nota_final !== null) { %>
+                                        <strong style="font-size: 1.1rem; color: var(--crimson);"><%= nota.nota_final %></strong>
+                                    <% } else { %>
+                                        <span style="color: var(--text-muted);">Não lançada</span>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhuma nota encontrada</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/aluno/dashboard" class="btn btn-secondary" style="margin-top: 2rem;">Voltar</a>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>
