@@ -1,55 +1,98 @@
-<h2>Matrículas Pendentes</h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matrículas - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<div style="margin: 20px 0;">
-    <a href="/funcionario/matriculas?estado=pendente" class="btn btn-primary">Pendentes</a>
-    <a href="/funcionario/matriculas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
-    <a href="/funcionario/matriculas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
-    <a href="/funcionario/matriculas" class="btn btn-secondary">Todas</a>
-</div>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Académica</p>
+                <h1>Matrículas Pendentes</h1>
+            </div>
+        </div>
 
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-    <thead>
-        <tr style="background: #f1f3f5;">
-            <th style="padding: 10px; text-align: left;">Aluno</th>
-            <th style="padding: 10px; text-align: left;">Curso</th>
-            <th style="padding: 10px; text-align: left;">Ano Letivo</th>
-            <th style="padding: 10px; text-align: left;">Estado</th>
-            <th style="padding: 10px; text-align: center;">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if (matriculas && matriculas.length > 0) { %>
-            <% matriculas.forEach(mat => { %>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px;"><%= mat.aluno_id.nome %></td>
-                    <td style="padding: 10px;"><%= mat.curso_id.nome %></td>
-                    <td style="padding: 10px;"><%= mat.ano_letivo %></td>
-                    <td style="padding: 10px;">
-                        <span style="padding: 5px 10px; border-radius: 5px; 
-                            <%= mat.estado === 'aprovada' ? 'background: #d4edda; color: #155724;' : 
-                                mat.estado === 'rejeitada' ? 'background: #f8d7da; color: #721c24;' :
-                                'background: #fff3cd; color: #856404;' %>">
-                            <%= mat.estado %>
-                        </span>
-                    </td>
-                    <td style="padding: 10px; text-align: center;">
-                        <% if (mat.estado === 'pendente') { %>
-                            <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
-                                <input type="hidden" name="acao" value="aprovada">
-                                <button type="submit" class="btn btn-success" style="font-size: 12px; padding: 5px 10px;">Aprovar</button>
-                            </form>
-                            <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
-                                <input type="hidden" name="acao" value="rejeitada">
-                                <button type="submit" class="btn btn-danger" style="font-size: 12px; padding: 5px 10px;">Rejeitar</button>
-                            </form>
-                        <% } %>
-                    </td>
-                </tr>
-            <% }); %>
-        <% } else { %>
-            <tr>
-                <td colspan="5" style="padding: 20px; text-align: center; color: #999;">Nenhuma matrícula encontrada</td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+        <!-- Filtros -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <a href="/funcionario/matriculas?estado=pendente" class="btn btn-primary">Pendentes</a>
+            <a href="/funcionario/matriculas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
+            <a href="/funcionario/matriculas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
+            <a href="/funcionario/matriculas" class="btn btn-secondary">Todas</a>
+        </div>
+
+        <!-- Tabela de Matrículas -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Curso</th>
+                        <th>Ano Letivo</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (matriculas && matriculas.length > 0) { %>
+                        <% matriculas.forEach(mat => { %>
+                            <tr>
+                                <td><strong><%= mat.aluno_id.nome %></strong></td>
+                                <td><%= mat.curso_id.nome %></td>
+                                <td><%= mat.ano_letivo %></td>
+                                <td>
+                                    <span style="padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+                                        <%= mat.estado === 'aprovada' ? 'background: var(--success-bg); color: var(--success);' : 
+                                            mat.estado === 'rejeitada' ? 'background: var(--danger-bg); color: var(--danger);' :
+                                            'background: var(--warning-bg); color: var(--warning);' %>">
+                                        <%= mat.estado %>
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <% if (mat.estado === 'pendente') { %>
+                                        <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
+                                            <input type="hidden" name="acao" value="aprovada">
+                                            <button type="submit" class="btn btn-success btn-sm">Aprovar</button>
+                                        </form>
+                                        <form method="POST" action="/funcionario/matricula/<%= mat._id %>/decidir" style="display: inline;">
+                                            <input type="hidden" name="acao" value="rejeitada">
+                                            <button type="submit" class="btn btn-danger btn-sm">Rejeitar</button>
+                                        </form>
+                                    <% } %>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhuma matrícula encontrada</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/funcionario/dashboard" class="btn btn-secondary" style="margin-top: 2rem;">Voltar</a>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

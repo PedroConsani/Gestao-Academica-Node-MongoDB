@@ -1,45 +1,88 @@
-<h2>Fichas de Aluno para Validar</h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fichas de Aluno - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<div style="margin: 20px 0;">
-    <a href="/gestor/fichas?estado=submetida" class="btn btn-primary">Submetidas</a>
-    <a href="/gestor/fichas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
-    <a href="/gestor/fichas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
-    <a href="/gestor/fichas" class="btn btn-secondary">Todas</a>
-</div>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Validação de Fichas</p>
+                <h1>Fichas de Aluno para Validar</h1>
+            </div>
+        </div>
 
-<table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-    <thead>
-        <tr style="background: #f1f3f5;">
-            <th style="padding: 10px; text-align: left;">Aluno</th>
-            <th style="padding: 10px; text-align: left;">Curso</th>
-            <th style="padding: 10px; text-align: left;">Estado</th>
-            <th style="padding: 10px; text-align: center;">Ações</th>
-        </tr>
-    </thead>
-    <tbody>
-        <% if (fichas && fichas.length > 0) { %>
-            <% fichas.forEach(ficha => { %>
-                <tr style="border-bottom: 1px solid #dee2e6;">
-                    <td style="padding: 10px;"><%= ficha.aluno_id.nome %></td>
-                    <td style="padding: 10px;"><%= ficha.curso_id ? ficha.curso_id.nome : 'N/A' %></td>
-                    <td style="padding: 10px;">
-                        <span style="padding: 5px 10px; border-radius: 5px; 
-                            <%= ficha.estado === 'aprovada' ? 'background: #d4edda; color: #155724;' : 
-                                ficha.estado === 'rejeitada' ? 'background: #f8d7da; color: #721c24;' :
-                                ficha.estado === 'submetida' ? 'background: #d1ecf1; color: #0c5460;' :
-                                'background: #fff3cd; color: #856404;' %>">
-                            <%= ficha.estado %>
-                        </span>
-                    </td>
-                    <td style="padding: 10px; text-align: center;">
-                        <a href="/gestor/ficha/<%= ficha._id %>/validar" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">Ver</a>
-                    </td>
-                </tr>
-            <% }); %>
-        <% } else { %>
-            <tr>
-                <td colspan="4" style="padding: 20px; text-align: center; color: #999;">Nenhuma ficha encontrada</td>
-            </tr>
-        <% } %>
-    </tbody>
-</table>
+        <!-- Filtros -->
+        <div style="display: flex; gap: 0.75rem; margin-bottom: 2rem; flex-wrap: wrap;">
+            <a href="/gestor/fichas?estado=submetida" class="btn btn-primary">Submetidas</a>
+            <a href="/gestor/fichas?estado=aprovada" class="btn btn-secondary">Aprovadas</a>
+            <a href="/gestor/fichas?estado=rejeitada" class="btn btn-secondary">Rejeitadas</a>
+            <a href="/gestor/fichas" class="btn btn-secondary">Todas</a>
+        </div>
+
+        <!-- Tabela de Fichas -->
+        <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Aluno</th>
+                        <th>Curso</th>
+                        <th>Estado</th>
+                        <th style="text-align: center;">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% if (fichas && fichas.length > 0) { %>
+                        <% fichas.forEach(ficha => { %>
+                            <tr>
+                                <td><strong><%= ficha.aluno_id.nome %></strong></td>
+                                <td><%= ficha.curso_id ? ficha.curso_id.nome : 'N/A' %></td>
+                                <td>
+                                    <span style="padding: 5px 10px; border-radius: 4px; font-size: 0.75rem; font-weight: 600;
+                                        <%= ficha.estado === 'aprovada' ? 'background: var(--success-bg); color: var(--success);' : 
+                                            ficha.estado === 'rejeitada' ? 'background: var(--danger-bg); color: var(--danger);' :
+                                            ficha.estado === 'submetida' ? 'background: var(--info-bg); color: var(--info);' :
+                                            'background: var(--warning-bg); color: var(--warning);' %>">
+                                        <%= ficha.estado %>
+                                    </span>
+                                </td>
+                                <td style="text-align: center;">
+                                    <a href="/gestor/ficha/<%= ficha._id %>/validar" class="btn btn-primary btn-sm">Ver</a>
+                                </td>
+                            </tr>
+                        <% }); %>
+                    <% } else { %>
+                        <tr>
+                            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhuma ficha encontrada</td>
+                        </tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div>
+
+        <a href="/gestor/dashboard" class="btn btn-secondary" style="margin-top: 2rem;">Voltar</a>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

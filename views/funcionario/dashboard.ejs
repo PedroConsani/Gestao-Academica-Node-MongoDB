@@ -1,21 +1,64 @@
-<h2>Dashboard - Funcionário</h2>
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
 
-<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin: 20px 0;">
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-        <h3>Matrículas Pendentes</h3>
-        <p style="font-size: 32px; font-weight: bold; color: #ff6b6b;"><%= stats.pendentes %></p>
-        <a href="/funcionario/matriculas?estado=pendente" class="btn btn-primary">Avaliar</a>
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Académica</p>
+                <h1>Dashboard - Funcionário</h1>
+            </div>
+        </div>
+
+        <!-- Cards de Estatísticas -->
+        <div class="cards-grid" style="margin-bottom: 3rem;">
+            <div class="card">
+                <h3>Matrículas Pendentes</h3>
+                <p style="font-size: 2rem; color: var(--danger); font-weight: bold; margin: 0.5rem 0;"><%= stats.pendentes %></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Aguardando avaliação</p>
+                <a href="/funcionario/matriculas?estado=pendente" class="btn btn-primary" style="margin-top: 1rem;">Avaliar</a>
+            </div>
+
+            <div class="card">
+                <h3>Pautas Abertas</h3>
+                <p style="font-size: 2rem; color: var(--warning); font-weight: bold; margin: 0.5rem 0;"><%= stats.pautasAbertas %></p>
+                <p style="color: var(--text-muted); font-size: 0.9rem;">Para edição de notas</p>
+                <a href="/funcionario/pautas" class="btn btn-primary" style="margin-top: 1rem;">Ver Pautas</a>
+            </div>
+        </div>
+
+        <!-- Ações Rápidas -->
+        <div class="card" style="background: var(--info-bg); border-left: 4px solid var(--info);">
+            <h3 style="color: var(--info);">Ações Rápidas</h3>
+            <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+                <a href="/funcionario/matriculas" class="btn btn-primary">Gerir Matrículas</a>
+                <a href="/funcionario/pauta/nova" class="btn btn-success">+ Nova Pauta</a>
+            </div>
+        </div>
     </div>
 
-    <div style="background: #f8f9fa; padding: 20px; border-radius: 8px;">
-        <h3>Pautas Abertas</h3>
-        <p style="font-size: 32px; font-weight: bold; color: #ffa94d;"><%= stats.pautasAbertas %></p>
-        <a href="/funcionario/pautas" class="btn btn-primary">Ver Pautas</a>
-    </div>
-</div>
-
-<div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-left: 4px solid #ff9800; border-radius: 5px;">
-    <h3 style="color: #ff9800; margin-bottom: 10px;">Ações Rápidas</h3>
-    <a href="/funcionario/matriculas" class="btn btn-primary" style="margin-right: 10px;">Gerir Matrículas</a>
-    <a href="/funcionario/pauta/nova" class="btn btn-success">+ Nova Pauta</a>
-</div>
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>
