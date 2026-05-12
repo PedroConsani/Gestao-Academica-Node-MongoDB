@@ -180,6 +180,33 @@ export async function showUCNova(req, res) {
   });
 }
 
+export async function showUCEditar(req, res) {
+  try {
+    const { id } = req.params;
+
+    const uc = await UnidadeCurricular.findById(id).populate('criado_por', 'nome');
+
+    if (!uc) {
+      return res.status(404).render('error', {
+        title: 'Erro',
+        message: 'UC não encontrada'
+      });
+    }
+
+    return res.render('gestor/uc-form', {
+      title: 'Editar UC',
+      uc
+    });
+  } catch (error) {
+    console.error('Erro ao carregar form UC:', error);
+    return res.status(500).render('error', {
+      title: 'Erro',
+      message: 'Erro ao carregar formulário'
+    });
+  }
+}
+
+
 export async function createUC(req, res) {
   try {
     const { nome, codigo, descricao, creditos } = req.body;

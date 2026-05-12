@@ -152,6 +152,31 @@ export async function listMatriculas(req, res) {
   }
 }
 
+export async function showMatricula(req, res) {
+  try {
+    const userId = req.session.user.id;
+    const { id } = req.params;
+
+    const matricula = await Matricula.findOne({ _id: id, aluno_id: userId })
+      .populate('curso_id', 'nome codigo')
+      .populate('decidido_por', 'nome');
+
+    if (!matricula) {
+      return res.status(404).render('shared/404', { title: 'Página não encontrada' });
+    }
+
+    // Por enquanto, não existe página de detalhe de matrícula no projeto.
+    // Redireciona para a listagem para eliminar o 404.
+    return res.redirect('/aluno/matriculas');
+  } catch (error) {
+    console.error('Erro ao mostrar matrícula:', error);
+    return res.status(500).render('error', {
+      title: 'Erro',
+      message: 'Erro ao mostrar matrícula'
+    });
+  }
+}
+
 export async function showMatriculaNova(req, res) {
   try {
     const Curso = await import('../models/Curso.js').then(m => m.default);

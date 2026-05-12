@@ -22,8 +22,10 @@ router.post('/curso/:id/toggle', gestorController.toggleCurso);
 // Unidades Curriculares
 router.get('/ucs', gestorController.listUCs);
 router.get('/uc/nova', gestorController.showUCNova);
+router.get('/uc/:id/editar', gestorController.showUCEditar);
 router.post('/uc', validateUC, handleValidationErrors, gestorController.createUC);
 router.post('/uc/:id', validateUC, handleValidationErrors, gestorController.updateUC);
+
 
 // Plano de Estudos
 router.get('/plano-estudos', gestorController.listPlanoEstudos);

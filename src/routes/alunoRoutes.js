@@ -12,6 +12,7 @@ router.post('/ficha', upload.single('foto'), handleUploadError, validateFicha, h
 router.post('/ficha/submit', alunoController.submitFicha);
 
 router.get('/matriculas', alunoController.listMatriculas);
+router.get('/matriculas/:id', alunoController.showMatricula);
 router.get('/matricula/nova', alunoController.showMatriculaNova);
 router.post('/matricula', validateMatricula, handleValidationErrors, alunoController.createMatricula);
 

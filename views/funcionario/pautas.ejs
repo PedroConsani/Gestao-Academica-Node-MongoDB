@@ -48,8 +48,9 @@
                     <% if (pautas && pautas.length > 0) { %>
                         <% pautas.forEach(pauta => { %>
                             <tr>
-                                <td><strong><%= pauta.uc_id.nome %></strong></td>
-                                <td><%= pauta.curso_id.nome %></td>
+                                <td><strong><%= pauta.uc_id?.nome || 'N/A' %></strong></td>
+                                <td><%= pauta.curso_id?.nome || 'N/A' %></td>
+
                                 <td><%= pauta.ano_letivo %></td>
                                 <td><code style="background: var(--bg2); padding: 2px 6px; border-radius: 3px;"><%= pauta.epoca %></code></td>
                                 <td style="text-align: center;">

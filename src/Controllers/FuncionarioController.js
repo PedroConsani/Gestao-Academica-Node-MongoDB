@@ -90,20 +90,26 @@ export async function listPautas(req, res) {
       .populate('uc_id', 'nome codigo')
       .populate('curso_id', 'nome codigo')
       .populate('criada_por', 'nome')
-      .sort({ criada_em: -1 });
+      .sort({ criada_em: -1 })
+      .lean();
+
+    // Alguns registos podem estar com referências inválidas (uc_id/curso_id ausentes).
+    // Para não quebrar o EJS, removemos apenas os casos incompletos.
+    const pautasFiltradas = (pautas || []).filter(p => p?.uc_id && p?.curso_id);
 
     res.render('funcionario/pautas', {
       title: 'Pautas',
-      pautas
+      pautas: pautasFiltradas
     });
   } catch (error) {
     console.error('Erro ao listar pautas:', error);
     res.status(500).render('error', { 
-      title: 'Erro', 
-      message: 'Erro ao listar pautas' 
+      title: 'Erro',
+      message: 'Erro ao listar pautas'
     });
   }
 }
+
 
 export async function showPautaNotas(req, res) {
   try {
@@ -240,22 +246,36 @@ export async function createPauta(req, res) {
       estado: 'aprovada'
     }).populate('aluno_id');
 
-    // Criar registros de notas para cada aluno
+    // Criar registros de notas para cada aluno (idempotente para evitar colisões do índice unique)
     for (const matricula of matriculas) {
-      await Nota.create({
-        pauta_id: pauta._id,
-        aluno_id: matricula.aluno_id._id,
-        nota_final: null
-      });
+      if (!matricula?.aluno_id?._id) {
+        throw new Error('Matrícula sem aluno_id populado ao criar notas');
+      }
+
+      await Nota.findOneAndUpdate(
+        { pauta_id: pauta._id, aluno_id: matricula.aluno_id._id },
+        { $setOnInsert: { nota_final: null } },
+        { upsert: true, new: false }
+      );
     }
+
 
     req.session.flash = { 
       success: `Pauta criada com sucesso! ${matriculas.length} alunos adicionados.` 
     };
     res.redirect(`/funcionario/pauta/${pauta._id}/notas`);
   } catch (error) {
-    console.error('Erro ao criar pauta:', error);
-    req.session.flash = { error: 'Erro ao criar pauta' };
+    // Normaliza mensagem para facilitar diagnóstico (principalmente erros de validação/duplicidade Mongo)
+    const message = error?.message || 'Erro desconhecido ao criar pauta';
+    console.error('Erro ao criar pauta:', { message, stack: error?.stack, code: error?.code });
+
+    // Se for erro de chave duplicada, dá um feedback melhor
+    const flashError = message.toLowerCase().includes('duplicate key')
+      ? 'Já existe uma pauta/nota para os mesmos dados (duplicado). Tente novamente.'
+      : `Erro ao criar pauta: ${message}`;
+
+    req.session.flash = { error: flashError };
     res.redirect('/funcionario/pauta/nova');
   }
 }
+
