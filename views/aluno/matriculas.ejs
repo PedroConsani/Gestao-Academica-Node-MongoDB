@@ -39,6 +39,7 @@
                         <th>Ano Letivo</th>
                         <th>Estado</th>
                         <th>Data Solicitação</th>
+                        <th>Ações</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -56,11 +57,16 @@
                                     </span>
                                 </td>
                                 <td><%= new Date(mat.criado_em).toLocaleDateString('pt-PT') %></td>
+                                <td>
+                                    <a href="/aluno/matriculas/<%= mat._id %>" class="btn btn-sm" style="padding: 0.4rem 0.8rem; font-size: 0.85rem;">
+                                        👁️ Ver Detalhes
+                                    </a>
+                                </td>
                             </tr>
                         <% }); %>
                     <% } else { %>
                         <tr>
-                            <td colspan="4" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhuma matrícula encontrada</td>
+                            <td colspan="5" style="text-align: center; padding: 2rem; color: var(--text-muted);">Nenhuma matrícula encontrada</td>
                         </tr>
                     <% } %>
                 </tbody>

@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes da Matrícula - Sistema Académico</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .matricula-info {
+            background: var(--bg-light);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            margin-bottom: 0.25rem;
+        }
+
+        .info-value {
+            font-size: 1rem;
+            color: var(--text);
+        }
+
+        .badge-estado {
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            width: fit-content;
+        }
+
+        .badge-aprovada {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .badge-rejeitada {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .badge-pendente {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .disciplinas-section {
+            margin-top: 2rem;
+        }
+
+        .disciplinas-section h2 {
+            margin-bottom: 1.5rem;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 0.5rem;
+        }
+
+        .ano-semestre {
+            margin-bottom: 2rem;
+            border-left: 4px solid var(--primary);
+            padding-left: 1rem;
+        }
+
+        .ano-semestre h3 {
+            margin: 0 0 1rem 0;
+            font-size: 1rem;
+            color: var(--primary);
+        }
+
+        .table-wrap {
+            overflow-x: auto;
+            margin-bottom: 2rem;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--bg-light);
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--text);
+            border-bottom: 2px solid var(--border);
+            font-size: 0.875rem;
+            text-transform: uppercase;
+        }
+
+        td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover {
+            background: var(--bg-light);
+        }
+
+        .uc-nome {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .uc-codigo {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+        }
+
+        .nota-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 3px;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .nota-positiva {
+            background: var(--success-bg);
+            color: var(--success);
+        }
+
+        .nota-negativa {
+            background: var(--danger-bg);
+            color: var(--danger);
+        }
+
+        .nota-nao-avaliado {
+            background: var(--warning-bg);
+            color: var(--warning);
+        }
+
+        .notas-col {
+            font-size: 0.875rem;
+        }
+
+        .sem-notas {
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            table {
+                font-size: 0.875rem;
+            }
+
+            th, td {
+                padding: 0.75rem 0.5rem;
+            }
+
+            .btn-group {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="navbar-brand">
+            <span>🎓</span>
+            Sistema Académico
+        </a>
+        <div class="navbar-user">
+            <% if (user) { %>
+                <span><strong><%= user.nome %></strong></span>
+                <span class="badge"><%= user.role %></span>
+                <a href="/logout" style="color: #fff; text-decoration: none; margin-left: 15px;">Logout</a>
+            <% } %>
+        </div>
+    </nav>
+
+    <div class="container">
+        <%- include('../shared/flash'); %>
+        <div class="page-header">
+            <div>
+                <p>Gestão Académica</p>
+                <h1>Detalhes da Matrícula</h1>
+            </div>
+        </div>
+
+        <!-- Informações da Matrícula -->
+        <div class="matricula-info">
+            <div class="info-grid">
+                <div class="info-item">
+                    <span class="info-label">Curso</span>
+                    <span class="info-value"><%= matricula.curso_id.nome %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Código</span>
+                    <span class="info-value"><%= matricula.curso_id.codigo %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Ano Letivo</span>
+                    <span class="info-value"><%= matricula.ano_letivo %></span>
+                </div>
+                <div class="info-item">
+                    <span class="info-label">Estado</span>
+                    <span class="badge-estado <%= matricula.estado === 'aprovada' ? 'badge-aprovada' : matricula.estado === 'rejeitada' ? 'badge-rejeitada' : 'badge-pendente' %>">
+                        <%= matricula.estado %>
+                    </span>
+                </div>
+                <% if (matricula.observacoes_aluno) { %>
+                    <div class="info-item">
+                        <span class="info-label">Observações do Aluno</span>
+                        <span class="info-value"><%= matricula.observacoes_aluno %></span>
+                    </div>
+                <% } %>
+                <% if (matricula.observacoes_func) { %>
+                    <div class="info-item">
+                        <span class="info-label">Observações do Funcionário</span>
+                        <span class="info-value"><%= matricula.observacoes_func %></span>
+                    </div>
+                <% } %>
+                <% if (matricula.decidido_em) { %>
+                    <div class="info-item">
+                        <span class="info-label">Decidido em</span>
+                        <span class="info-value"><%= new Date(matricula.decidido_em).toLocaleDateString('pt-PT') %></span>
+                    </div>
+                <% } %>
+            </div>
+        </div>
+
+        <!-- Plano de Estudos -->
+        <div class="disciplinas-section">
+            <h2>📚 Plano de Estudos e Notas</h2>
+
+            <% if (planoEstudos && planoEstudos.length > 0) { %>
+                <% 
+                    // Agrupar disciplinas por ano e semestre
+                    const grouped = {};
+                    planoEstudos.forEach(pe => {
+                        const key = `${pe.ano}º Ano - Semestre ${pe.semestre}`;
+                        if (!grouped[key]) {
+                            grouped[key] = [];
+                        }
+                        grouped[key].push(pe);
+                    });
+                %>
+
+                <% Object.keys(grouped).sort().forEach(key => { %>
+                    <div class="ano-semestre">
+                        <h3><%= key %></h3>
+                        
+                        <div class="table-wrap">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Disciplina</th>
+                                        <th>Código</th>
+                                        <th>Créditos</th>
+                                        <th>Status</th>
+                                        <th>Notas</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <% grouped[key].forEach(pe => {
+                                        const ucId = pe.uc_id._id.toString();
+                                        const notas = notasMap[ucId] || [];
+                                        const melhorNota = notas.length > 0 ? Math.max(...notas.filter(n => n.nota !== null && n.nota !== undefined).map(n => n.nota)) : null;
+                                    %>
+                                        <tr>
+                                            <td>
+                                                <span class="uc-nome"><%= pe.uc_id.nome %></span><br>
+                                                <span class="uc-codigo"><%= pe.uc_id.descricao || '' %></span>
+                                            </td>
+                                            <td><%= pe.uc_id.codigo %></td>
+                                            <td><%= pe.uc_id.creditos %></td>
+                                            <td>
+                                                <span style="font-size: 0.875rem; color: var(--text-muted);">
+                                                    <%= pe.obrigatoria ? '✓ Obrigatória' : '○ Opcional' %>
+                                                </span>
+                                            </td>
+                                            <td class="notas-col">
+                                                <% if (notas.length > 0) { %>
+                                                    <% notas.forEach(nota => { %>
+                                                        <div style="margin-bottom: 0.25rem;">
+                                                            <% if (nota.nota !== null && nota.nota !== undefined) { %>
+                                                                <span class="nota-badge <%= nota.nota >= 10 ? 'nota-positiva' : 'nota-negativa' %>">
+                                                                    <%= nota.epoca %>: <%= nota.nota.toFixed(1) %>
+                                                                </span>
+                                                            <% } else { %>
+                                                                <span class="nota-badge nota-nao-avaliado">
+                                                                    <%= nota.epoca %>: Sem avaliação
+                                                                </span>
+                                                            <% } %>
+                                                        </div>
+                                                    <% }); %>
+                                                <% } else { %>
+                                                    <span class="sem-notas">Sem notas registadas</span>
+                                                <% } %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div style="padding: 2rem; text-align: center; background: var(--bg-light); border-radius: 6px; color: var(--text-muted);">
+                    <p>Nenhuma disciplina encontrada para o plano de estudos deste curso.</p>
+                </div>
+            <% } %>
+        </div>
+
+        <!-- Botões de Navegação -->
+        <div class="btn-group">
+            <a href="/aluno/matriculas" class="btn btn-secondary">← Voltar às Matrículas</a>
+            <a href="/aluno/dashboard" class="btn btn-secondary">Dashboard</a>
+        </div>
+    </div>
+
+    <footer style="text-align: center; padding: 2rem; color: var(--text-muted); border-top: 1px solid var(--border); margin-top: 3rem;">
+        <p>&copy; 2026 Sistema Académico</p>
+    </footer>
+</body>
+</html>

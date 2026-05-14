@@ -165,9 +165,54 @@ export async function showMatricula(req, res) {
       return res.status(404).render('shared/404', { title: 'Página não encontrada' });
     }
 
-    // Por enquanto, não existe página de detalhe de matrícula no projeto.
-    // Redireciona para a listagem para eliminar o 404.
-    return res.redirect('/aluno/matriculas');
+    // Buscar o plano de estudos do curso
+    const PlanoEstudos = await import('../models/PlanoEstudos.js').then(m => m.default);
+    const planoEstudos = await PlanoEstudos.find({ curso_id: matricula.curso_id._id })
+      .populate('uc_id', 'nome codigo creditos descricao')
+      .sort({ ano: 1, semestre: 1 });
+
+    // Buscar as notas do aluno para as disciplinas deste curso
+    const notasMap = {};
+    if (planoEstudos.length > 0) {
+      const ucIds = planoEstudos.map(pe => pe.uc_id._id);
+      
+      // Buscar pautas para as UCs do curso
+      const Pauta = await import('../models/Pauta.js').then(m => m.default);
+      const pautas = await Pauta.find({ 
+        uc_id: { $in: ucIds },
+        curso_id: matricula.curso_id._id,
+        ano_letivo: matricula.ano_letivo 
+      });
+
+      if (pautas.length > 0) {
+        const pautaIds = pautas.map(p => p._id);
+        
+        // Buscar notas do aluno para essas pautas
+        const notas = await Nota.find({
+          aluno_id: userId,
+          pauta_id: { $in: pautaIds }
+        }).populate('pauta_id', 'uc_id epoca');
+
+        // Organizar notas por UC
+        notas.forEach(nota => {
+          const ucId = nota.pauta_id.uc_id.toString();
+          if (!notasMap[ucId]) {
+            notasMap[ucId] = [];
+          }
+          notasMap[ucId].push({
+            epoca: nota.pauta_id.epoca,
+            nota: nota.nota_final
+          });
+        });
+      }
+    }
+
+    res.render('aluno/matricula-detalhes', {
+      title: 'Detalhes da Matrícula',
+      matricula,
+      planoEstudos,
+      notasMap
+    });
   } catch (error) {
     console.error('Erro ao mostrar matrícula:', error);
     return res.status(500).render('error', {
