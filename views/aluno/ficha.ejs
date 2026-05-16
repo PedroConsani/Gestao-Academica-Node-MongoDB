@@ -297,41 +297,50 @@
                     method: 'POST',
                     headers: { 'Accept': 'application/json' },
                     body: formData
-                }).then(response => {
+                }).then(async response => {
                     if (!response.ok) {
-                        return response.text().then(text => {
-                            try {
-                                const data = JSON.parse(text);
-                                throw new Error(data.error || 'Erro ao guardar ficha');
-                            } catch (e) {
-                                throw new Error(text || 'Erro ao guardar ficha');
-                            }
-                        });
+                        const text = await response.text();
+                        try {
+                            const data = JSON.parse(text);
+                            const msg = data?.error || 'Erro ao guardar ficha';
+                            throw new Error(msg);
+                        } catch (e) {
+                            throw new Error(text || 'Erro ao guardar ficha');
+                        }
                     }
+
                     // Depois de guardar, submeter para validação
                     return fetch('/aluno/ficha/submit', {
                         method: 'POST',
                         headers: { 'Accept': 'application/json' },
                         body: new FormData(form)
                     });
-                }).then(response => {
+                }).then(async response => {
                     if (!response.ok) {
-                        return response.text().then(text => {
-                            try {
-                                const data = JSON.parse(text);
-                                throw new Error(data.error || 'Erro desconhecido');
-                            } catch (e) {
-                                throw new Error(text || 'Erro desconhecido');
-                            }
-                        });
-                    }
-                    return response.text().then(text => {
+                        const text = await response.text();
                         try {
-                            return JSON.parse(text);
+                            const data = JSON.parse(text);
+                            const msg = data?.error || 'Há inconsistências nos dados.';
+                            // Exibe erros de validação (se existirem) de forma mais amigável
+                            if (Array.isArray(data?.details) && data.details.length > 0) {
+                                const formatted = data.details
+                                    .map(d => `${d.msg}`)
+                                    .slice(0, 5)
+                                    .join('\n');
+                                throw new Error(msg + '\n' + formatted);
+                            }
+                            throw new Error(msg);
                         } catch (e) {
-                            return { redirectUrl: '/aluno/ficha' };
+                            throw new Error(text || 'Erro ao submeter ficha');
                         }
-                    });
+                    }
+
+                    const text = await response.text();
+                    try {
+                        return JSON.parse(text);
+                    } catch (e) {
+                        return { redirectUrl: '/aluno/ficha' };
+                    }
                 }).then(data => {
                     if (data && data.redirectUrl) {
                         window.location.href = data.redirectUrl;
@@ -340,8 +349,9 @@
                     }
                 }).catch(error => {
                     console.error('Error:', error);
-                    alert('Erro: ' + error.message);
+                    alert(error.message || 'Erro ao processar a ficha');
                 });
+
 
             }
         }
