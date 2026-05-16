@@ -155,7 +155,17 @@ export function handleValidationErrors(req, res, next) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     req.session.flash = { error: 'Existem erros no formulário. Por favor revise.' };
+
+    const wantsJson = (req.headers.accept || '').includes('application/json');
+    if (wantsJson) {
+      return res.status(422).json({
+        error: 'Existem erros no formulário. Por favor revise.',
+        details: errors.array()
+      });
+    }
+
     return res.status(422).redirect(req.get('referer') || '/');
   }
   next();
 }
+

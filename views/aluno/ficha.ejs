@@ -295,33 +295,54 @@
                 // Primeiro, guardar os dados
                 fetch('/aluno/ficha', {
                     method: 'POST',
+                    headers: { 'Accept': 'application/json' },
                     body: formData
                 }).then(response => {
-                    if (response.ok) {
-                        // Depois de guardar, submeter para validação
-                        return fetch('/aluno/ficha/submit', {
-                            method: 'POST',
-                            body: new FormData(form)
-                        });
-                    } else {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Erro ao guardar ficha');
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                throw new Error(data.error || 'Erro ao guardar ficha');
+                            } catch (e) {
+                                throw new Error(text || 'Erro ao guardar ficha');
+                            }
                         });
                     }
+                    // Depois de guardar, submeter para validação
+                    return fetch('/aluno/ficha/submit', {
+                        method: 'POST',
+                        headers: { 'Accept': 'application/json' },
+                        body: new FormData(form)
+                    });
                 }).then(response => {
-                    if (response.redirected) {
-                        window.location.href = response.url;
-                    } else if (response.ok) {
-                        window.location.href = '/aluno/ficha';
-                    } else {
-                        return response.json().then(data => {
-                            throw new Error(data.error || 'Erro desconhecido');
+                    if (!response.ok) {
+                        return response.text().then(text => {
+                            try {
+                                const data = JSON.parse(text);
+                                throw new Error(data.error || 'Erro desconhecido');
+                            } catch (e) {
+                                throw new Error(text || 'Erro desconhecido');
+                            }
                         });
+                    }
+                    return response.text().then(text => {
+                        try {
+                            return JSON.parse(text);
+                        } catch (e) {
+                            return { redirectUrl: '/aluno/ficha' };
+                        }
+                    });
+                }).then(data => {
+                    if (data && data.redirectUrl) {
+                        window.location.href = data.redirectUrl;
+                    } else {
+                        window.location.href = '/aluno/ficha';
                     }
                 }).catch(error => {
                     console.error('Error:', error);
                     alert('Erro: ' + error.message);
                 });
+
             }
         }
     </script>

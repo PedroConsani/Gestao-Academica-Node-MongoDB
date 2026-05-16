@@ -99,16 +99,36 @@ export async function updateFicha(req, res) {
 
     await ficha.save();
 
+    // Se for via fetch, devolve JSON para o front-end não depender de redirect
+    const wantsJson = (req.headers.accept || '').includes('application/json');
+    if (wantsJson) {
+      return res.status(200).json({
+        success: true,
+        redirectUrl: '/aluno/ficha',
+        ficha: {
+          _id: ficha._id,
+          estado: ficha.estado,
+          curso_id: ficha.curso_id
+        }
+      });
+    }
+
     req.session.flash = { success: 'Ficha atualizada com sucesso!' };
     res.redirect('/aluno/ficha');
   } catch (error) {
     console.error('Erro ao atualizar ficha:', error);
+    const wantsJson = (req.headers.accept || '').includes('application/json');
+    if (wantsJson) {
+      return res.status(500).json({ error: 'Erro ao atualizar ficha' });
+    }
+
     res.status(500).render('error', { 
       title: 'Erro', 
       message: 'Erro ao atualizar ficha' 
     });
   }
 }
+
 
 export async function submitFicha(req, res) {
   try {
@@ -122,6 +142,17 @@ export async function submitFicha(req, res) {
 
     if (!ficha) {
       return res.status(404).json({ error: 'Ficha não encontrada' });
+    }
+
+    // Garantir mínimo para não submeter ficha incompleta
+    const cursoIdFinal = curso_id || String(ficha.curso_id || '');
+    if (!cursoIdFinal || String(cursoIdFinal).trim() === '') {
+      const wantsJson = (req.headers.accept || '').includes('application/json');
+      if (wantsJson) {
+        return res.status(422).json({ error: 'Curso é obrigatório para submeter a ficha.' });
+      }
+      req.session.flash = { error: 'Curso é obrigatório para submeter a ficha.' };
+      return res.redirect('/aluno/ficha');
     }
 
     // Atualizar dados da ficha ANTES de submeter
@@ -146,13 +177,29 @@ export async function submitFicha(req, res) {
     
     await ficha.save();
 
+
+    // Se for via fetch, devolve JSON para o front-end não depender de redirect
+    const wantsJson = (req.headers.accept || '').includes('application/json');
+    if (wantsJson) {
+      return res.status(200).json({
+        success: true,
+        redirectUrl: '/aluno/ficha'
+      });
+    }
+
     req.session.flash = { success: 'Ficha submetida para validação!' };
     res.redirect('/aluno/ficha');
   } catch (error) {
     console.error('Erro ao submeter ficha:', error);
+    const wantsJson = (req.headers.accept || '').includes('application/json');
+    if (wantsJson) {
+      return res.status(500).json({ error: 'Erro ao submeter ficha' });
+    }
+
     res.status(500).json({ error: 'Erro ao submeter ficha' });
   }
 }
+
 
 export async function listMatriculas(req, res) {
   try {
