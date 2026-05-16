@@ -138,11 +138,14 @@
                             <% }); %>
                         <% } %>
                     </select>
+                    <small id="uc_loading" style="display:none;">A carregar UCs do plano de estudo...</small>
+                    <small id="uc_empty" style="display:none;">Sem UCs encontradas para este curso.</small>
                 </div>
 
                 <div class="form-row">
                     <div class="form-group">
                         <label for="ano_letivo">Ano Letivo: <span style="color: var(--crimson);">*</span></label>
+
                         <input type="text" id="ano_letivo" name="ano_letivo" required 
                                placeholder="Ex: 2024/2025"
                                pattern="\d{4}/\d{4}">
@@ -183,5 +186,66 @@
             </div>
         </form>
     </div>
+
+    <script>
+        (function () {
+            const cursoSelect = document.getElementById('curso_id');
+            const ucSelect = document.getElementById('uc_id');
+            const loadingEl = document.getElementById('uc_loading');
+            const emptyEl = document.getElementById('uc_empty');
+
+            async function loadUcs() {
+                const cursoId = cursoSelect?.value;
+                if (!cursoId) {
+                    ucSelect.innerHTML = '<option value="">-- Selecione uma UC --</option>';
+                    if (emptyEl) emptyEl.style.display = 'none';
+                    return;
+                }
+
+                if (loadingEl) loadingEl.style.display = 'block';
+                if (emptyEl) emptyEl.style.display = 'none';
+
+                try {
+                    const resp = await fetch('/funcionario/ucs-por-curso?curso_id=' + encodeURIComponent(cursoId), {
+                        headers: { 'Accept': 'application/json' }
+                    });
+
+                    if (!resp.ok) {
+                        throw new Error('Erro ao carregar UCs');
+                    }
+
+                    const data = await resp.json();
+                    const ucs = data?.ucs || [];
+
+                    ucSelect.innerHTML = '<option value="">-- Selecione uma UC --</option>';
+
+                    if (ucs.length === 0) {
+                        if (emptyEl) emptyEl.style.display = 'block';
+                        return;
+                    }
+
+                    for (const uc of ucs) {
+                        const opt = document.createElement('option');
+                        opt.value = uc._id;
+                        opt.textContent = `${uc.nome} (${uc.codigo})`;
+                        ucSelect.appendChild(opt);
+                    }
+                } catch (e) {
+                    console.error(e);
+                    ucSelect.innerHTML = '<option value="">-- Selecione uma UC --</option>';
+                    if (emptyEl) emptyEl.style.display = 'block';
+                } finally {
+                    if (loadingEl) loadingEl.style.display = 'none';
+                }
+            }
+
+            if (cursoSelect) {
+                cursoSelect.addEventListener('change', loadUcs);
+                // Caso o user chegue com curso já selecionado
+                loadUcs();
+            }
+        })();
+    </script>
 </body>
 </html>
+

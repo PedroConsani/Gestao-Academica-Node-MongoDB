@@ -171,12 +171,12 @@ export async function updateNota(req, res) {
 
 export async function showPautaNova(req, res) {
   try {
-    const ucs = await UnidadeCurricular.find({ ativo: true }).select('nome codigo');
+    // UCs serão filtradas via JS com base no curso e no PlanoEstudos.
     const cursos = await Curso.find({ ativo: true }).select('nome codigo');
 
     res.render('funcionario/pauta-nova', {
       title: 'Nova Pauta',
-      ucs,
+      ucs: [],
       cursos,
       epocas: ['Normal', 'Recurso', 'Especial']
     });
@@ -188,6 +188,7 @@ export async function showPautaNova(req, res) {
     });
   }
 }
+
 
 export async function createPauta(req, res) {
   try {
