@@ -32,39 +32,49 @@
 
         <div class="card" style="max-width: 700px;">
             <% if (typeof error !== 'undefined' && error) { %>
-                <div class="alert alert-danger"><%= error %></div>
+                <div class="alert alert-danger">
+                    <strong>⚠️ Aviso:</strong> <%= error %>
+                </div>
+                <div style="margin-top: 1rem;">
+                    <p style="color: var(--text-muted); font-size: 0.95rem;">
+                        Para solicitar uma matrícula, é necessário que sua ficha de aluno seja previamente aprovada.
+                    </p>
+                    <a href="/aluno/ficha" class="btn btn-primary" style="margin-top: 1rem;">
+                        → Ir para Minha Ficha
+                    </a>
+                </div>
+            <% } else { %>
+                <form method="POST" action="/aluno/matricula">
+                    <div class="form-group">
+                        <label for="curso_id">Curso *</label>
+                        <select id="curso_id" name="curso_id" required>
+                            <option value="">Selecione um curso</option>
+                            <% if (cursos) { %>
+                                <% cursos.forEach(curso => { %>
+                                    <option value="<%= curso._id %>"><%= curso.nome %> (<%= curso.codigo %>)</option>
+                                <% }); %>
+                            <% } %>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ano_letivo">Ano Letivo *</label>
+                        <input type="text" id="ano_letivo" name="ano_letivo" placeholder="ex: 2024/2025" 
+                               pattern="\d{4}/\d{4}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="observacoes_aluno">Observações (opcional)</label>
+                        <textarea id="observacoes_aluno" name="observacoes_aluno" 
+                                  placeholder="Escreva qualquer observação relevante..."></textarea>
+                    </div>
+
+                    <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                        <button type="submit" class="btn btn-primary">Solicitar Matrícula</button>
+                        <a href="/aluno/matriculas" class="btn btn-secondary">Cancelar</a>
+                    </div>
+                </form>
             <% } %>
-
-            <form method="POST" action="/aluno/matricula">
-                <div class="form-group">
-                    <label for="curso_id">Curso *</label>
-                    <select id="curso_id" name="curso_id" required>
-                        <option value="">Selecione um curso</option>
-                        <% if (cursos) { %>
-                            <% cursos.forEach(curso => { %>
-                                <option value="<%= curso._id %>"><%= curso.nome %> (<%= curso.codigo %>)</option>
-                            <% }); %>
-                        <% } %>
-                    </select>
-                </div>
-
-                <div class="form-group">
-                    <label for="ano_letivo">Ano Letivo *</label>
-                    <input type="text" id="ano_letivo" name="ano_letivo" placeholder="ex: 2024/2025" 
-                           pattern="\d{4}/\d{4}" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="observacoes_aluno">Observações (opcional)</label>
-                    <textarea id="observacoes_aluno" name="observacoes_aluno" 
-                              placeholder="Escreva qualquer observação relevante..."></textarea>
-                </div>
-
-                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
-                    <button type="submit" class="btn btn-primary">Solicitar Matrícula</button>
-                    <a href="/aluno/matriculas" class="btn btn-secondary">Cancelar</a>
-                </div>
-            </form>
         </div>
     </div>
 

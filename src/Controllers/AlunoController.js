@@ -224,6 +224,21 @@ export async function showMatricula(req, res) {
 
 export async function showMatriculaNova(req, res) {
   try {
+    const userId = req.session.user.id;
+    
+    // Verificar se a ficha do aluno está aprovada
+    const ficha = await FichaAluno.findOne({ aluno_id: userId });
+    
+    if (!ficha || ficha.estado !== 'aprovada') {
+      return res.render('aluno/matricula-nova', {
+        title: 'Nova Matrícula',
+        cursos: [],
+        error: ficha ? 
+          `Sua ficha está em estado "${ficha.estado}". Aguarde até que seja aprovada para solicitar matrícula.` :
+          'Crie sua ficha de aluno primeiro para poder solicitar matrícula.'
+      });
+    }
+
     const Curso = await import('../models/Curso.js').then(m => m.default);
     const cursos = await Curso.find({ ativo: true }).select('nome codigo');
 
@@ -245,6 +260,22 @@ export async function createMatricula(req, res) {
     const userId = req.session.user.id;
     const { curso_id, ano_letivo, observacoes_aluno } = req.body;
 
+    // Verificar se a ficha do aluno está aprovada
+    const ficha = await FichaAluno.findOne({ aluno_id: userId });
+    
+    if (!ficha || ficha.estado !== 'aprovada') {
+      const Curso = await import('../models/Curso.js').then(m => m.default);
+      const cursos = await Curso.find({ ativo: true }).select('nome codigo');
+      
+      return res.render('aluno/matricula-nova', {
+        title: 'Nova Matrícula',
+        cursos,
+        error: ficha ? 
+          `Sua ficha está em estado "${ficha.estado}". Aguarde até que seja aprovada para solicitar matrícula.` :
+          'Crie sua ficha de aluno primeiro para poder solicitar matrícula.'
+      });
+    }
+
     // Verificar se já tem matrícula para este ano
     const existing = await Matricula.findOne({ 
       aluno_id: userId, 
@@ -253,8 +284,12 @@ export async function createMatricula(req, res) {
     });
 
     if (existing) {
+      const Curso = await import('../models/Curso.js').then(m => m.default);
+      const cursos = await Curso.find({ ativo: true }).select('nome codigo');
+      
       return res.render('aluno/matricula-nova', {
         title: 'Nova Matrícula',
+        cursos,
         error: 'Você já tem uma matrícula para este ano neste curso.'
       });
     }
