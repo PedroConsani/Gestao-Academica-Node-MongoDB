@@ -9,7 +9,7 @@ router.get('/dashboard', alunoController.dashboard);
 
 router.get('/ficha', alunoController.showFicha);
 router.post('/ficha', upload.single('foto'), handleUploadError, validateFicha, handleValidationErrors, alunoController.updateFicha);
-router.post('/ficha/submit', alunoController.submitFicha);
+router.post('/ficha/submit', upload.single('foto'), handleUploadError, validateFicha, handleValidationErrors, alunoController.submitFicha);
 
 router.get('/matriculas', alunoController.listMatriculas);
 router.get('/matriculas/:id', alunoController.showMatricula);

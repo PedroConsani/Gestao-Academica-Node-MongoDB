@@ -96,7 +96,7 @@ export const validateMatricula = [
 
 export const validateFicha = [
   body('curso_id')
-    .notEmpty().withMessage('Curso é obrigatório')
+    .optional({ checkFalsy: true })
     .isMongoId().withMessage('Curso inválido'),
   body('data_nascimento')
     .optional()

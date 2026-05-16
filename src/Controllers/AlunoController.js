@@ -113,14 +113,37 @@ export async function updateFicha(req, res) {
 export async function submitFicha(req, res) {
   try {
     const userId = req.session.user.id;
-    const ficha = await FichaAluno.findOne({ aluno_id: userId });
+    const { 
+      curso_id, data_nascimento, nacionalidade, nif, cc, 
+      telefone, morada, codigo_postal, localidade 
+    } = req.body;
+
+    let ficha = await FichaAluno.findOne({ aluno_id: userId });
 
     if (!ficha) {
       return res.status(404).json({ error: 'Ficha não encontrada' });
     }
 
+    // Atualizar dados da ficha ANTES de submeter
+    ficha.curso_id = curso_id || ficha.curso_id;
+    ficha.data_nascimento = data_nascimento || ficha.data_nascimento;
+    ficha.nacionalidade = nacionalidade || ficha.nacionalidade;
+    ficha.nif = nif || ficha.nif;
+    ficha.cc = cc || ficha.cc;
+    ficha.telefone = telefone || ficha.telefone;
+    ficha.morada = morada || ficha.morada;
+    ficha.codigo_postal = codigo_postal || ficha.codigo_postal;
+    ficha.localidade = localidade || ficha.localidade;
+
+    // Atualizar foto se enviada
+    if (req.file) {
+      ficha.foto_path = `/uploads/photos/${req.file.filename}`;
+    }
+
+    // Marcar como submetida
     ficha.estado = 'submetida';
     ficha.submetida_em = new Date();
+    
     await ficha.save();
 
     req.session.flash = { success: 'Ficha submetida para validação!' };

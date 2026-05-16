@@ -290,22 +290,37 @@
         function submitForm() {
             if (confirm('Tem a certeza que deseja submeter a ficha para validação? Não poderá editar os dados após submissão.')) {
                 const form = document.querySelector('form');
-                const submitUrl = form.action.replace('/ficha', '/ficha/submit');
-                
                 const formData = new FormData(form);
                 
-                fetch(submitUrl, {
+                // Primeiro, guardar os dados
+                fetch('/aluno/ficha', {
                     method: 'POST',
                     body: formData
                 }).then(response => {
                     if (response.ok) {
-                        window.location.reload();
+                        // Depois de guardar, submeter para validação
+                        return fetch('/aluno/ficha/submit', {
+                            method: 'POST',
+                            body: new FormData(form)
+                        });
                     } else {
-                        alert('Erro ao submeter ficha');
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Erro ao guardar ficha');
+                        });
+                    }
+                }).then(response => {
+                    if (response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        window.location.href = '/aluno/ficha';
+                    } else {
+                        return response.json().then(data => {
+                            throw new Error(data.error || 'Erro desconhecido');
+                        });
                     }
                 }).catch(error => {
                     console.error('Error:', error);
-                    alert('Erro ao submeter ficha');
+                    alert('Erro: ' + error.message);
                 });
             }
         }
