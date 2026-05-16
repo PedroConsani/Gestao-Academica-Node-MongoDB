@@ -7,7 +7,6 @@ Sistema web completo para gestão académica: fichas de aluno, matrículas, plan
 [![Node.js](https://img.shields.io/badge/Node.js-18%2B-green)](https://nodejs.org)
 [![Express](https://img.shields.io/badge/Express-4.18-blue)](https://expressjs.com)
 [![MongoDB](https://img.shields.io/badge/MongoDB-6%2B-brightgreen)](https://www.mongodb.com)
-[![License](https://img.shields.io/badge/License-MIT-yellow)](LICENSE)
 
 ---
 
